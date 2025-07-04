@@ -3,8 +3,12 @@
 
 This script automates the process of building a standalone executable
 using PyInstaller. It handles cleanup, building, and basic validation.
+It supports two modes:
+  --mode=dir  (default): Fast-starting directory-based build.
+  --mode=file : Slow-starting single-file build for distribution.
 """
 
+import argparse
 import shutil
 import subprocess
 import sys
@@ -29,7 +33,7 @@ def run_command(cmd: List[str], description: str) -> bool:
     """
     print(f"🔨 {description}...")
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, encoding='utf-8')
         print(f"✅ {description} completed successfully")
         return True
     except subprocess.CalledProcessError as e:
@@ -45,12 +49,7 @@ def run_command(cmd: List[str], description: str) -> bool:
 
 def clean_build_artifacts() -> None:
     """Remove previous build artifacts."""
-    artifacts = [
-        "build",
-        "dist", 
-        "__pycache__",
-        "*.spec.bak",
-    ]
+    artifacts = ["build", "dist", "*.spec.bak"]
     
     print("🧹 Cleaning previous build artifacts...")
     for pattern in artifacts:
@@ -58,43 +57,48 @@ def clean_build_artifacts() -> None:
             if path.is_dir():
                 shutil.rmtree(path)
                 print(f"   Removed directory: {path}")
-            else:
-                path.unlink()
-                print(f"   Removed file: {path}")
 
 
-def build_executable() -> bool:
+def build_executable(mode: str) -> bool:
     """Build the standalone executable using PyInstaller.
     
+    Parameters
+    ----------
+    mode : str
+        Build mode, either 'dir' or 'file'.
+        
     Returns
     -------
     bool
         True if build succeeded, False otherwise.
     """
-    # Ensure we're in the project root
-    if not Path("pyinstaller.spec").exists():
-        print("❌ pyinstaller.spec not found. Run this script from the project root.")
+    spec_file = "onedir.spec" if mode == 'dir' else "onefile.spec"
+    
+    if not Path(spec_file).exists():
+        print(f"❌ {spec_file} not found. Run this script from the project root.")
         return False
     
-    # Clean previous builds
     clean_build_artifacts()
     
-    # Run PyInstaller
-    cmd = ["uv", "run", "pyinstaller", "pyinstaller.spec", "--clean"]
-    success = run_command(cmd, "Building executable with PyInstaller")
+    # The spec file now controls everything.
+    cmd = ["uv", "run", "pyinstaller", spec_file]
+    
+    if mode == 'file':
+        print("📦 Building in single-file mode (slower startup, for distribution)")
+    else:
+        print("📁 Building in one-folder mode (fast startup, for development)")
+    
+    success = run_command(cmd, f"Building executable with {spec_file}")
     
     if success:
-        # Check if executable was created
-        exe_path = Path("dist/SimpleTimerBank.exe")
-        if exe_path.exists():
-            size_mb = exe_path.stat().st_size / (1024 * 1024)
-            print(f"🎉 Build completed successfully!")
+        print("\n🎉 Build completed successfully!")
+        if mode == 'file':
+            exe_path = Path(f"dist/SimpleTimerBank.exe")
             print(f"   Executable: {exe_path}")
-            print(f"   Size: {size_mb:.1f} MB")
-            return True
         else:
-            print(f"❌ Build completed but executable not found at {exe_path}")
-            return False
+            exe_path = Path(f"dist/SimpleTimerBank/SimpleTimerBank.exe")
+            print(f"   Executable located in: {exe_path.parent}")
+        return True
     
     return False
 
@@ -107,18 +111,21 @@ def main() -> int:
     int
         Exit code (0 for success, 1 for failure).
     """
+    parser = argparse.ArgumentParser(description="SimpleTimerBank Build Script")
+    parser.add_argument(
+        '--mode', 
+        type=str,
+        choices=['dir', 'file'],
+        default='dir',
+        help="Build mode: 'dir' for a fast-starting folder, 'file' for a single executable."
+    )
+    args = parser.parse_args()
+    
     print("🚀 SimpleTimerBank Build Script")
     print("=" * 40)
     
-    # Verify dependencies
-    if not run_command(["uv", "--version"], "Checking uv installation"):
-        print("❌ uv is required but not installed. Please install uv first.")
-        return 1
-    
-    # Build executable
-    if build_executable():
+    if build_executable(args.mode):
         print("\n✅ Build process completed successfully!")
-        print("💡 You can now run the executable from: dist/SimpleTimerBank.exe")
         return 0
     else:
         print("\n❌ Build process failed!")

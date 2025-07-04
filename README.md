@@ -1,74 +1,28 @@
 # SimpleTimerBank
 
-[![Release](https://img.shields.io/github/v/release/supersheepbear/SimpleTimerBank)](https://img.shields.io/github/v/release/supersheepbear/SimpleTimerBank)
-[![Build status](https://img.shields.io/github/actions/workflow/status/supersheepbear/SimpleTimerBank/main.yml?branch=main)](https://github.com/supersheepbear/SimpleTimerBank/actions/workflows/main.yml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/supersheepbear/SimpleTimerBank/branch/main/graph/badge.svg)](https://codecov.io/gh/supersheepbear/SimpleTimerBank)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/supersheepbear/SimpleTimerBank)](https://img.shields.io/github/commit-activity/m/supersheepbear/SimpleTimerBank)
-[![License](https://img.shields.io/github/license/supersheepbear/SimpleTimerBank)](https://img.shields.io/github/license/supersheepbear/SimpleTimerBank)
+A simple desktop timer application with a time balance, built with Python and PySide6.
 
-timer bbank that is used for time management
+[![Documentation](https://img.shields.io/badge/docs-published-blue)](https://supersheepbear.github.io/SimpleTimerBank/)
+[![License](https://img.shields.io/github/license/supersheepbear/SimpleTimerBank)](https://github.com/supersheepbear/SimpleTimerBank/blob/main/LICENSE)
 
-- **Github repository**: <https://github.com/supersheepbear/SimpleTimerBank/>
-- **Documentation** <https://supersheepbear.github.io/SimpleTimerBank/>
+This application provides a time "bank" where you can deposit or withdraw time, and then spend that balance using a built-in countdown timer.
 
-## Getting started with your project
+![Screenshot](https://raw.githubusercontent.com/supersheepbear/SimpleTimerBank/main/docs/assets/screenshot.png)
 
-### 1. Create a New Repository
+## Quickstart
 
-First, create a repository on GitHub with the same name as this project, and then run the following commands:
+This project uses [`uv`](https://github.com/astral-sh/uv) for package and environment management.
 
-```bash
-git init -b main
-git add .
-git commit -m "init commit"
-git remote add origin git@github.com:supersheepbear/SimpleTimerBank.git
-git push -u origin main
-```
+1.  **Install Dependencies**
 
-### 2. Set Up Your Development Environment
+    ```sh
+    uv sync
+    ```
 
-Then, install the environment and the pre-commit hooks with
+2.  **Run the Application**
 
-```bash
-make install
-```
+    ```sh
+    uv run simpletimerbank
+    ```
 
-This will also generate your `uv.lock` file
-
-### 3. Run the pre-commit hooks
-
-Initially, the CI/CD pipeline might be failing due to formatting issues. To resolve those run:
-
-```bash
-uv run pre-commit run -a
-```
-
-### 4. Commit the changes
-
-Lastly, commit the changes made by the two steps above to your repository.
-
-```bash
-git add .
-git commit -m 'Fix formatting issues'
-git push origin main
-```
-
-You are now ready to start development on your project!
-The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
-
-To finalize the set-up for publishing to PyPI, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/publishing/#set-up-for-pypi).
-For activating the automatic documentation with MkDocs, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/mkdocs/#enabling-the-documentation-on-github).
-To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/codecov/).
-
-## Releasing a new version
-
-- Create an API Token on [PyPI](https://pypi.org/).
-- Add the API Token to your projects secrets with the name `PYPI_TOKEN` by visiting [this page](https://github.com/supersheepbear/SimpleTimerBank/settings/secrets/actions/new).
-- Create a [new release](https://github.com/supersheepbear/SimpleTimerBank/releases/new) on Github.
-- Create a new tag in the form `*.*.*`.
-
-For more details, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/cicd/#how-to-trigger-a-release).
-
----
-
-Repository initiated with [fpgmaas/cookiecutter-uv](https://github.com/fpgmaas/cookiecutter-uv).
+For more detailed information, please see the [full documentation](https://supersheepbear.github.io/SimpleTimerBank/).

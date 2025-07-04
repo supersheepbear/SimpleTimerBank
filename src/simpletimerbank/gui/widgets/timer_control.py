@@ -36,13 +36,6 @@ class TimerControlWidget(QWidget):
         # Create main layout
         main_layout = QVBoxLayout(self)
         
-        # Add explanation label
-        explanation = QLabel("Use the controls below to start a time withdrawal session. "
-                            "When you stop the timer, any unused time will be returned to your bank.", self)
-        explanation.setWordWrap(True)
-        explanation.setStyleSheet("font-size: 11px; color: #666; margin-bottom: 5px;")
-        main_layout.addWidget(explanation)
-        
         # Group box for controls
         group_box = QGroupBox("Timer Controls", self)
         button_layout = QHBoxLayout(group_box)

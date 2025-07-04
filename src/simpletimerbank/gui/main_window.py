@@ -61,22 +61,69 @@ class MainWindow(QMainWindow):
         
         # --- Bank Balance Section ---
         balance_section = QVBoxLayout()
-        
-        # Bank balance header with explanation
         bank_header_layout = QVBoxLayout()
         bank_header = QLabel("Your Time Bank Balance", self)
         bank_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 5px;")
-        bank_explanation = QLabel("This is your available time. You can deposit or withdraw time using the controls below.", self)
-        bank_explanation.setWordWrap(True)
-        bank_explanation.setStyleSheet("font-size: 11px; color: #666;")
-        
         bank_header_layout.addWidget(bank_header)
-        bank_header_layout.addWidget(bank_explanation)
         balance_section.addLayout(bank_header_layout)
-        
         self._time_display = TimeDisplayWidget(self, font_family=font_family)
         balance_section.addWidget(self._time_display)
         main_layout.addLayout(balance_section)
+        
+        # --- Transaction Controls ---
+        transaction_group = QGroupBox("Manage Bank Balance")
+        transaction_group.setStyleSheet("""
+            QGroupBox {
+                font-size: 14px;
+                font-weight: bold;
+                border: 1px solid #999;
+                border-radius: 5px;
+                margin-top: 10px;
+                background-color: #f0f0f0;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 3px;
+            }
+            QPushButton {
+                font-size: 13px;
+                padding: 8px;
+            }
+        """)
+        transaction_group_layout = QVBoxLayout()
+
+        # Amount entry
+        amount_layout = QHBoxLayout()
+        amount_label = QLabel("Amount:")
+        self._amount_edit = QTimeEdit(self)
+        self._amount_edit.setDisplayFormat("HH:mm:ss")
+        self._amount_edit.setTime(QTime(0, 15, 0))
+        amount_layout.addWidget(amount_label)
+        amount_layout.addWidget(self._amount_edit)
+        transaction_group_layout.addLayout(amount_layout)
+
+        # Convenience buttons
+        convenience_layout = QHBoxLayout()
+        presets = {"15m": 15 * 60, "30m": 30 * 60, "1h": 60 * 60, "2h": 120 * 60}
+        for text, seconds in presets.items():
+            btn = QPushButton(text, self)
+            btn.clicked.connect(lambda checked=False, secs=seconds: self._set_amount(secs))
+            convenience_layout.addWidget(btn)
+        transaction_group_layout.addLayout(convenience_layout)
+
+        # Direct operations
+        direct_ops_layout = QHBoxLayout()
+        self._deposit_button = QPushButton("Deposit", self)
+        self._withdraw_button = QPushButton("Instant Withdraw", self)
+        self._set_balance_button = QPushButton("Set Balance", self)
+        direct_ops_layout.addWidget(self._deposit_button)
+        direct_ops_layout.addWidget(self._withdraw_button)
+        direct_ops_layout.addWidget(self._set_balance_button)
+        transaction_group_layout.addLayout(direct_ops_layout)
+        
+        transaction_group.setLayout(transaction_group_layout)
+        main_layout.addWidget(transaction_group)
         
         # Add separator
         separator = QFrame(self)
@@ -112,45 +159,28 @@ class MainWindow(QMainWindow):
         withdrawal_section.addWidget(self._overdraft_indicator)
         
         main_layout.addLayout(withdrawal_section)
-
-        # --- Transaction Controls ---
-        transaction_group = QGroupBox("Manage Bank Balance")
-        transaction_group_layout = QVBoxLayout()
-
-        # Amount entry
-        amount_layout = QHBoxLayout()
-        amount_label = QLabel("Amount:")
-        self._amount_edit = QTimeEdit(self)
-        self._amount_edit.setDisplayFormat("HH:mm:ss")
-        self._amount_edit.setTime(QTime(0, 15, 0))
-        amount_layout.addWidget(amount_label)
-        amount_layout.addWidget(self._amount_edit)
-        transaction_group_layout.addLayout(amount_layout)
-
-        # Convenience buttons
-        convenience_layout = QHBoxLayout()
-        presets = {"15m": 15 * 60, "30m": 30 * 60, "1h": 60 * 60, "2h": 120 * 60}
-        for text, seconds in presets.items():
-            btn = QPushButton(text, self)
-            btn.clicked.connect(lambda checked=False, secs=seconds: self._set_amount(secs))
-            convenience_layout.addWidget(btn)
-        transaction_group_layout.addLayout(convenience_layout)
-
-        # Direct operations
-        direct_ops_layout = QHBoxLayout()
-        self._deposit_button = QPushButton("Deposit", self)
-        self._withdraw_button = QPushButton("Instant Withdraw", self)
-        self._set_balance_button = QPushButton("Set Balance", self)
-        direct_ops_layout.addWidget(self._deposit_button)
-        direct_ops_layout.addWidget(self._withdraw_button)
-        direct_ops_layout.addWidget(self._set_balance_button)
-        transaction_group_layout.addLayout(direct_ops_layout)
-        
-        transaction_group.setLayout(transaction_group_layout)
-        main_layout.addWidget(transaction_group)
         
         # --- Timed Withdrawal Controls ---
         self._timer_control = TimerControlWidget(self)
+        self._timer_control.setStyleSheet("""
+            QGroupBox {
+                font-size: 14px;
+                font-weight: bold;
+                border: 1px solid #88c;
+                border-radius: 5px;
+                margin-top: 10px;
+                background-color: #e8e8ff;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 3px;
+            }
+            QPushButton {
+                font-size: 13px;
+                padding: 8px;
+            }
+        """)
         main_layout.addWidget(self._timer_control)
         
         # Add status bar

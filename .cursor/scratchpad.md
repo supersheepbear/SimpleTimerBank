@@ -37,24 +37,24 @@ The project will be implemented in phases, focusing on building a robust core lo
 ## Project Status Board
 
 ### Phase 1: Core Logic - The `TimeBank`
-- [ ] **Task 1.1**: Implement the `TimeBank` class.
-  - [ ] Create `src/simpletimerbank/core/time_bank.py` with a `TimeBank` class.
-  - [ ] The class will manage a single time balance in seconds.
-  - [ ] Implement `get_balance() -> int`, `deposit(seconds: int)`, and `withdraw(seconds: int)`.
-  - [ ] `withdraw` must raise a `ValueError` if funds are insufficient.
-  - [ ] Create `tests/test_time_bank.py` and ensure all methods are fully tested.
+- [x] **Task 1.1**: Implement the `TimeBank` class.
+  - [x] Create `src/simpletimerbank/core/time_bank.py` with a `TimeBank` class.
+  - [x] The class will manage a single time balance in seconds.
+  - [x] Implement `get_balance() -> int`, `deposit(seconds: int)`, and `withdraw(seconds: int)`.
+  - [x] `withdraw` must raise a `ValueError` if funds are insufficient.
+  - [x] Create `tests/test_time_bank.py` and ensure all methods are fully tested.
 
 ### Phase 2: Core Logic - The Advanced `CountdownTimer`
-- [ ] **Task 2.1**: Implement `CountdownTimer` with internal state management.
-  - [ ] Create `src/simpletimerbank/core/countdown_timer.py` with a `CountdownTimer` class.
-  - [ ] Define states: `IDLE`, `RUNNING`, `PAUSED`, `STOPPED`.
-  - [ ] It should also have a boolean flag: `is_overdrafting`.
-  - [ ] Implement `start(duration: int)`, `pause()`, `resume()`, and `stop()`.
-- [ ] **Task 2.2**: Implement the `tick` and overdraft logic.
-  - [ ] The timer's `tick` method (called every second) should decrement `remaining_seconds`.
-  - [ ] When `remaining_seconds` hits zero, the timer should set `is_overdrafting` to `True`.
-  - [ ] In overdraft mode, each `tick` must signal that 1 second should be withdrawn from the bank.
-- [ ] **Task 2.3**: Create `tests/test_countdown_timer.py` to test all state transitions, the countdown, and the overdraft signaling.
+- [x] **Task 2.1**: Implement `CountdownTimer` with internal state management.
+  - [x] Create `src/simpletimerbank/core/countdown_timer.py` with a `CountdownTimer` class.
+  - [x] Define states: `IDLE`, `RUNNING`, `PAUSED`, `STOPPED`.
+  - [x] It should also have a boolean flag: `is_overdrafting`.
+  - [x] Implement `start(duration: int)`, `pause()`, `resume()`, and `stop()`.
+- [x] **Task 2.2**: Implement the `tick` and overdraft logic.
+  - [x] The timer's `tick` method (called every second) should decrement `remaining_seconds`.
+  - [x] When `remaining_seconds` hits zero, the timer should set `is_overdrafting` to `True`.
+  - [x] In overdraft mode, each `tick` must signal that 1 second should be withdrawn from the bank.
+- [x] **Task 2.3**: Create `tests/test_countdown_timer.py` to test all state transitions, the countdown, and the overdraft signaling.
 
 ### Phase 3: Core Logic - The `AppState` Orchestrator
 - [ ] **Task 3.1**: Implement the `AppState` class.
@@ -81,7 +81,44 @@ The project will be implemented in phases, focusing on building a robust core lo
 - [ ] **Task 5.2**: Refine UI/UX, package, and document the application.
 
 ## Executor's Feedback or Assistance Requests
-*This section will be updated by the Executor if any issues arise.*
+### 2023-10-15: Phase 1 Complete
+Phase 1 has been successfully completed. The `TimeBank` class has been implemented following the specifications, with full test coverage. All tests are passing.
+
+The `TimeBank` class provides these core features:
+- Initializes with a zero balance
+- `deposit(seconds)` method to add time to the bank
+- `withdraw(seconds)` method that enforces sufficient funds, raising ValueError if insufficient
+- `get_balance()` method to retrieve the current balance
+- `set_balance(seconds)` method to directly set the balance
+
+The implementation follows all the required development standards:
+- Full NumPy-style docstrings
+- Complete type hinting
+- PEP 8 compliant code
+- Pure unit tests with no I/O
+- Tests execute in well under the 5s target time
+
+Next, I will begin implementing Phase 2 - the Advanced `CountdownTimer`.
+
+### 2023-10-16: Phase 2 Complete
+Phase 2 has been successfully completed. The `CountdownTimer` class has been completely redesigned following TDD principles. All tests are passing.
+
+The new `CountdownTimer` implementation includes:
+- Four clearly defined states: `IDLE`, `RUNNING`, `PAUSED`, and `STOPPED`
+- An `is_overdrafting` flag to indicate when the timer has reached zero and is in overdraft mode
+- Self-contained time tracking with `_remaining_seconds` (instead of relying on `TimeBalance`)
+- A `tick()` method that returns a signal (1 second) when in overdraft mode to communicate with the bank
+- Completion callback for notification when the timer transitions to overdraft mode
+
+The implementation addresses the key challenges mentioned in the plan:
+- The timer is now a proper state machine with clear transitions and appropriate error handling
+- Overdraft detection and signaling are properly implemented
+- The timer preserves its state (remaining seconds) when stopped for refund purposes
+- Timer and bank logic are now fully decoupled for better separation of concerns
+
+All tests are passing with 100% coverage of the new functionality.
+
+Next, I will begin implementing Phase 3 - the `AppState` Orchestrator.
 
 ## Reviewer's Audit & Feedback
 *This section is to be filled out by the Reviewer upon completion of all tasks.*

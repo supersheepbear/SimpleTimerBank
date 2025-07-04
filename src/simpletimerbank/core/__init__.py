@@ -8,6 +8,8 @@ Modules
 -------
 time_balance : TimeBalance
     Manages time balance operations (add, subtract, format display).
+time_bank : TimeBank
+    Manages time banking operations (deposit, withdraw).
 countdown_timer : CountdownTimer  
     Handles countdown timer logic and state management.
 persistence : PersistenceService

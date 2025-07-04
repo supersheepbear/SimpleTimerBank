@@ -1,0 +1,143 @@
+# SimpleTimerBank Desktop Application - Project Scratchpad
+
+## Background and Motivation
+
+用户希望创建一个简单的桌面计时应用程序，具体需求如下：
+
+1. **框架**: 使用 PySide6 框架开发桌面应用
+2. **时间余额管理**: 用户可以增加或减少时间余额
+3. **倒计时功能**: 启动倒计时器时会消耗时间余额  
+4. **数据持久化**: 关闭应用时保存剩余时间，重新打开时恢复
+5. **独立部署**: 最终打包成独立的 `.exe` 可执行文件
+
+这是一个专注于时间管理的简单工具，不需要复杂功能，重点在于核心的时间余额管理和倒计时逻辑。
+
+## Key Challenges and Analysis
+
+### 1. 架构设计挑战
+- **GUI框架集成**: 需要添加 PySide6 依赖并设计合适的用户界面
+- **业务逻辑分离**: 时间管理逻辑需要与 GUI 解耦，便于单元测试
+- **状态管理**: 需要管理应用状态（余额、计时器状态、用户设置等）
+
+### 2. 核心功能实现
+- **时间余额系统**: 需要支持时间的增减操作，格式化显示
+- **倒计时引擎**: 需要精确的定时器，实时更新余额
+- **数据持久化**: 选择合适的存储格式（JSON/pickle），处理文件读写错误
+
+### 3. 测试策略
+- **纯单元测试**: 所有业务逻辑必须通过 mock 进行隔离测试
+- **GUI 测试排除**: GUI 组件不进行单元测试，专注于业务逻辑测试
+- **定时器测试**: 需要 mock 时间相关操作，确保测试稳定
+
+### 4. 打包部署
+- **PyInstaller 集成**: 需要配置 PyInstaller 打包 PySide6 应用
+- **依赖管理**: 确保所有运行时依赖都被正确打包
+- **跨平台考量**: 虽然目标是 Windows .exe，但代码应保持平台无关性
+
+## High-level Task Breakdown
+
+### Phase 1: 项目基础设施 (Foundation)
+- [x] **Task 1.1**: 添加 PySide6 和相关依赖到 pyproject.toml ✅
+- [x] **Task 1.2**: 创建基础的应用程序入口点和项目结构 ✅
+- [ ] **Task 1.3**: 设置 PyInstaller 配置用于 .exe 打包
+
+### Phase 2: 核心业务逻辑 (Core Logic)
+- [ ] **Task 2.1**: 实现时间余额管理类 (TimeBalance)
+- [ ] **Task 2.2**: 实现倒计时器类 (CountdownTimer) 
+- [ ] **Task 2.3**: 实现数据持久化服务 (PersistenceService)
+- [ ] **Task 2.4**: 实现应用状态管理器 (AppStateManager)
+
+### Phase 3: 用户界面 (GUI Implementation)
+- [ ] **Task 3.1**: 创建主窗口基础框架
+- [ ] **Task 3.2**: 实现时间余额显示和编辑界面
+- [ ] **Task 3.3**: 实现倒计时控制界面（开始/暂停/停止按钮）
+- [ ] **Task 3.4**: 集成业务逻辑与 GUI 界面
+
+### Phase 4: 集成与部署 (Integration & Deployment)
+- [ ] **Task 4.1**: 应用启动和关闭时的数据加载/保存
+- [ ] **Task 4.2**: 错误处理和用户友好的错误提示
+- [ ] **Task 4.3**: 最终 .exe 打包测试和优化
+
+## Project Status Board
+
+当前状态: **Phase 1 执行中 - Task 1.1 完成**
+
+### 已完成任务
+- [x] 项目需求分析
+- [x] 技术挑战识别  
+- [x] 任务分解和优先级排序
+- [x] **Task 1.1**: 添加 PySide6 和相关依赖到 pyproject.toml
+- [x] **Task 1.2**: 创建基础的应用程序入口点和项目结构
+
+### 当前任务
+- [ ] 准备开始 Task 1.3: 设置 PyInstaller 配置用于 .exe 打包
+
+### 待完成任务
+- Phase 1: Task 1.3
+- Phase 2-4: 所有任务等待执行
+
+## Executor's Feedback or Assistance Requests
+
+### Task 1.1 Completion Report (✅ 已完成)
+**执行日期**: $(Get-Date)  
+**任务**: 添加 PySide6 和相关依赖到 pyproject.toml
+
+**已完成工作**:
+- ✅ 添加 `PySide6>=6.6.0` 作为运行时依赖
+- ✅ 添加 `pyinstaller>=6.0.0` 作为开发依赖
+- ✅ 验证 pyproject.toml 配置正确性
+
+**技术说明**:
+- PySide6 6.6.0+ 选择基于稳定性和功能完整性
+- PyInstaller 6.0.0+ 提供良好的 PySide6 应用打包支持
+- 依赖已正确分类：PySide6 为运行时依赖，PyInstaller 为开发时依赖
+
+**下一步**: 准备开始 Task 1.2 - 创建基础的应用程序入口点和项目结构
+
+### Task 1.2 Completion Report (✅ 已完成)
+**执行日期**: $(Get-Date)  
+**任务**: 创建基础的应用程序入口点和项目结构
+
+**已完成工作**:
+- ✅ 删除占位符文件 (foo.py, test_foo.py)
+- ✅ 创建主应用入口点 (`src/simpletimerbank/main.py`)
+- ✅ 建立核心业务逻辑包结构 (`src/simpletimerbank/core/`)
+- ✅ 建立GUI组件包结构 (`src/simpletimerbank/gui/`)
+- ✅ 创建所有核心模块占位符存根 (time_balance, countdown_timer, persistence, app_state)
+- ✅ 添加控制台脚本入口点到 pyproject.toml
+- ✅ 验证模块导入功能正常
+
+**项目结构已建立**:
+```
+src/simpletimerbank/
+├── main.py              # 应用程序入口点
+├── core/                # 核心业务逻辑 (非GUI)
+│   ├── time_balance.py  # 时间余额管理
+│   ├── countdown_timer.py # 倒计时器逻辑
+│   ├── persistence.py   # 数据持久化服务
+│   └── app_state.py     # 应用状态管理器
+└── gui/                 # GUI组件
+    ├── main_window.py   # 主窗口 (待Phase 3实现)
+    └── widgets/         # 自定义组件
+```
+
+**技术说明**:
+- 业务逻辑与GUI完全分离，便于单元测试
+- 所有核心模块已建立完整的API接口规范
+- NumPy风格文档字符串，符合项目标准
+- 控制台入口点配置，可通过 `uv run simpletimerbank` 运行
+
+**下一步**: 开始 Task 1.3 - 设置 PyInstaller 配置用于 .exe 打包
+
+## Reviewer's Audit & Feedback
+
+*此区域仅由 Reviewer 填写*
+
+## Lessons
+
+*记录项目过程中的重要发现、解决方案和经验教训*
+
+---
+
+**计划创建时间**: $(Get-Date)
+**当前阶段**: Planning Complete - Ready for Execution 

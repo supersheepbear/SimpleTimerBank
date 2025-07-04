@@ -197,38 +197,38 @@ AppStateManager (协调层)
 ## Reviewer's Audit & Feedback
 
 **Audit Date**: $(Get-Date)
-**Phase Audited**: Phase 2 - Core Business Logic
+**Phase Audited**: Phase 3 - GUI Implementation
 **Reviewer**: Gemini Pro
-**Overall Status**: ✅ **PASS**
+**Overall Status**: ✅ **PASS (with Remediation)**
 
 ---
 
 ### A. Requirement Fulfillment
--   `[PASS]` **Functional Correctness**: The implemented business logic in `TimeBalance`, `CountdownTimer`, `PersistenceService`, and `AppStateManager` comprehensively fulfills all core functional requirements outlined in the plan for Phase 2.
+-   `[PASS]` **Functional Correctness**: The GUI successfully provides the required user interface for all core business logic functions (time display, editing, and timer control).
 
-### B. Test Protocol Adherence (`.cursor/pytest rule.md`)
--   `[PASS]` **Pure Unit Tests**: All 79 new tests are 100% isolated. The use of `unittest.mock.patch` for `threading.Timer` and file system operations (`open`, `pathlib.Path`) is exemplary and strictly follows the protocol.
--   `[PASS]` **No Forbidden Tests**: The test suite remains free of any integration or E2E tests.
--   `[PASS]` **Test Execution**: `pytest` successfully runs and passes all 79 tests, confirming the correctness of the implementation against the test specifications.
--   `[PASS]` **Speed**: The entire test suite for core logic executes in under 0.3 seconds, which is exceptionally fast and well within the target.
+### B. Code & Protocol Adherence
+-   `[PASS]` **Code Quality**: The GUI code is well-structured into a `main_window` and a `widgets` sub-package, demonstrating good separation of concerns.
+-   `[PASS]` **Integration**: The `MainWindow` correctly uses the `AppStateManager` as a facade to interact with the core logic, keeping the integration clean.
 
-### C. Python Development Protocol Adherence (`.cursor/python cursor rule.md`)
--   `[PASS]` **Package Structure**: The code is perfectly organized within the `src/simpletimerbank/core` package, maintaining a clean separation from the future GUI layer.
--   `[PASS]` **Docstrings**: All new classes and public methods are documented with high-quality, NumPy-style docstrings that clearly define their purpose, parameters, and return values.
--   `[PASS]` **Type Hinting**: The code demonstrates 100% type hint coverage for all function signatures, including the use of `TYPE_CHECKING` for resolving circular dependencies.
--   `[PASS]` **Code Quality**: The code is modular, clean, and highly readable. The `AppStateManager` serves as an effective facade, simplifying the API for the upcoming GUI layer.
+### C. User Feedback & Remediation
+-   `[FIXED]` **Missing Font Asset**: The initial implementation referenced a non-existent font file, causing a runtime warning.
+    -   **Remediation**: Corrected the font path to `assets/fonts/DSEG7-Classic-Bold.ttf`. Added a placeholder file (`assets/fonts/placeholder.txt`) with instructions for the user to manually download and place the required open-source font. Implemented a fallback to a system font ("Courier New") if the custom font is not found.
+-   `[FIXED]` **Incorrect Font Size**: The font size for the time display was too large, causing the text to be clipped.
+    -   **Remediation**: The font size in `TimeDisplayWidget` was reduced from `80pt` to `60pt` for better visual fit.
+-   `[IMPROVED]` **Error Handling**: The logic for subtracting time in `MainWindow` was improved to provide clearer user feedback in case of an error.
+
+---
 
 ### D. Workflow & Documentation Hygiene
--   `[PASS]` **Scratchpad Integrity**: The Executor meticulously updated the scratchpad, providing a clear and detailed report for the completion of Phase 2.
--   `[PASS]` **Lessons Learned**: No new lessons were documented, which is acceptable as this phase was executed without major incidents.
+-   `[PASS]` **Scratchpad Integrity**: The Executor's report for Phase 3 was clear, although this review cycle was necessary to address the identified issues. The scratchpad will be updated with this final review.
 
 ---
 
 ### Reviewer's Summary & Verdict
 
-The execution of Phase 2 was flawless. The **Executor** followed the TDD protocol with exceptional discipline, resulting in a robust, fully-tested, and well-documented core business logic layer. The quality of both the implementation and the tests is of a very high standard.
+The initial implementation of Phase 3 had functional and aesthetic issues. However, all reported problems have been successfully remediated. The font loading is now more robust with a fallback mechanism, and the display is correctly sized.
 
-**The project is approved to proceed to Phase 3.**
+**The project is approved to proceed to Phase 4.**
 
 ## Lessons
 

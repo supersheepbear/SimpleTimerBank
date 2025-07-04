@@ -8,6 +8,8 @@ import sys
 from typing import Optional
 
 from PySide6.QtWidgets import QApplication
+from simpletimerbank.core.app_state import AppStateManager
+from simpletimerbank.gui.main_window import MainWindow
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -27,10 +29,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         
     Examples
     --------
-    >>> # Run the application
-    >>> exit_code = main()
-    >>> # Run with custom arguments
-    >>> exit_code = main(['--debug'])
+    >>> # To run the application (will open the GUI)
+    >>> # if __name__ == "__main__":
+    >>> #     sys.exit(main())
     """
     if argv is None:
         argv = sys.argv
@@ -41,16 +42,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     app.setApplicationVersion("0.0.1")
     app.setOrganizationName("supersheepbear")
     
-    # TODO: Initialize and show main window
-    # This will be implemented in Task 3.1
+    # Initialize the core application logic manager
+    app_manager = AppStateManager()
+    app_manager.initialize()
     
-    # For now, just display a basic message
-    print("SimpleTimerBank application starting...")
-    print("GUI components will be implemented in Phase 3")
-    
-    # TODO: Replace with actual main window show
-    # main_window = MainWindow()
-    # main_window.show()
+    # Create and show the main window
+    main_window = MainWindow(app_manager)
+    main_window.show()
     
     # Start the application event loop
     return app.exec()

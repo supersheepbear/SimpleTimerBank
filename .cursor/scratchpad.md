@@ -2,76 +2,89 @@
 
 ## Background and Motivation
 
-The project's direction has been revised to create a "Time Bank" application. The core idea is that a user earns time by doing work, deposits that time into a virtual bank, and can then "spend" or "consume" that banked time on leisure activities, like playing video games. This plan replaces all previous versions.
+The project's goal is to create a "Time Bank" application. A user can store units of time in a "bank" and then "spend" this time via a countdown timer. This allows for disciplined time management, where time must be earned before it can be spent.
 
-The main features are:
-1.  A persistent time balance that acts as the "bank account".
-2.  The ability to manually deposit time (the reward for work).
-3.  A consumption timer to spend the banked time.
-4.  Sound notifications to signal when a consumption session is over.
+The core features required are:
+1.  **Time Bank**: A central store for the user's time balance.
+2.  **Balance Display**: A clear, visible display of the current time balance.
+3.  **Manual Adjustments**: The ability to add or remove time from the bank.
+4.  **Consumption Timer**: A timer to spend a specific amount of time withdrawn from the bank. This timer has `Start`, `Pause`, `Resume`, and `Stop` controls.
+5.  **Refund on Stop**: If a timer session is stopped early, the unused time is refunded to the bank.
+6.  **Overdraft**: If the timer completes its initial cycle and is not stopped, it will continue to run, draining the main bank balance until it hits zero.
+7.  **Notifications**: A notification is triggered when the initial timer cycle completes.
 
 ## Key Challenges and Analysis
 
-1.  **Data Model Refactor**: The existing `TimeBalance` concept must evolve into a `TimeBank` model that supports transactional operations (deposit, withdraw). This is a critical shift in the core logic.
-2.  **State Management**: The application state must be carefully managed. We need to prevent situations like spending more time than is available in the bank or ensuring that time is correctly deducted only *after* a session is completed.
-3.  **UI/UX for Banking**: The user interface must be intuitive for a banking metaphor. It needs clear areas for viewing the balance, making deposits, and starting a withdrawal (consumption) session.
-4.  **Transaction Logic**: The process of starting a timer, having it run, and then debiting the account must be atomic and robust to errors or the application closing prematurely.
+1.  **Stateful Timer Logic**: The `CountdownTimer` is no longer a simple countdown. It must be a state machine that manages `Idle`, `Running`, `Paused`, and `Stopped` states to handle the user controls correctly.
+2.  **Timer-Bank Interaction Protocol**: The relationship between the `CountdownTimer` and `TimeBank` is now highly transactional and must be robust.
+    -   **Start**: Time must be withdrawn from the bank to fund the timer. This is a hard requirement.
+    -   **Stop**: Unused time from the timer's initial duration must be reliably refunded to the bank.
+    -   **Overdraft Tick**: During the overdraft phase, the timer must trigger a 1-second withdrawal from the bank on every tick.
+3.  **The Overdraft Mechanism**: This is the most complex logic. The `CountdownTimer` must seamlessly transition from its "normal countdown" phase to an "overdraft" phase. This requires a clear state flag (e.g., `is_overdrafting`). The UI must also visually reflect this critical state change.
+4.  **UI Decoupling**: The application UI needs to be conceptually split. There should be a "Bank" area for managing the balance and a "Timer" area for the countdown. Both must communicate through a central controller (`AppState`) to remain decoupled and maintainable.
+5.  **Atomicity**: Actions like stopping and refunding must be treated as atomic operations to prevent data corruption (e.g., refunding time without actually stopping the timer).
 
 ## High-level Task Breakdown
 
-The project will be rebuilt in three phases:
+The project will be implemented in phases, focusing on building a robust core logic foundation before the UI.
 
-*   **Phase 1**: Core Time Bank Logic (The Vault)
-*   **Phase 2**: User Interface Implementation (The Bank Teller)
-*   **Phase 3**: Advanced Features & UX (Upgrades)
+*   **Phase 1**: Core Logic - The `TimeBank`
+*   **Phase 2**: Core Logic - The Advanced `CountdownTimer`
+*   **Phase 3**: Core Logic - The `AppState` Orchestrator
+*   **Phase 4**: GUI Implementation
+*   **Phase 5**: Final Features and Polish
 
 ## Project Status Board
 
-### Phase 1: Core Time Bank Logic (The Vault)
-- [ ] **Task 1.1**: Redesign `TimeBalance` into `TimeBank`.
-  - [ ] Create a `TimeBank` class in `src/simpletimerbank/core/time_bank.py`.
-  - [ ] It must manage a single balance value (in seconds).
-  - [ ] It must have `deposit(seconds: int)` and `withdraw(seconds: int)` methods.
-  - [ ] The `withdraw` method should raise an error if the amount is greater than the balance.
-  - [ ] Ensure all logic is covered by pure unit tests in `tests/test_time_bank.py`.
-- [ ] **Task 1.2**: Update Persistence and State Management.
-  - [ ] Modify `PersistenceService` to save and load the `TimeBank` state.
-  - [ ] Update `AppStateManager` to hold an instance of `TimeBank` instead of `TimeBalance`.
-  - [ ] Ensure related tests for these modules are updated and pass.
+### Phase 1: Core Logic - The `TimeBank`
+- [ ] **Task 1.1**: Implement the `TimeBank` class.
+  - [ ] Create `src/simpletimerbank/core/time_bank.py` with a `TimeBank` class.
+  - [ ] The class will manage a single time balance in seconds.
+  - [ ] Implement `get_balance() -> int`, `deposit(seconds: int)`, and `withdraw(seconds: int)`.
+  - [ ] `withdraw` must raise a `ValueError` if funds are insufficient.
+  - [ ] Create `tests/test_time_bank.py` and ensure all methods are fully tested.
 
-### Phase 2: User Interface Implementation (The Bank Teller)
-- [ ] **Task 2.1**: Redesign the Main Window.
-  - [ ] The UI should have three clear sections: Balance Display, Deposit Control, and Consumption Control.
-- [ ] **Task 2.2**: Implement Balance Display Widget.
-  - [ ] A large, clear display showing the current time in the bank.
-  - [ ] It should update automatically when the balance changes.
-- [ ] **Task 2.3**: Implement Deposit Control Widget.
-  - [ ] Input fields to specify hours, minutes, and seconds to deposit.
-  - [ ] A "Deposit" button to add the specified time to the bank.
-- [ ] **Task 2.4**: Implement Consumption Control Widget.
-  - [ ] Input fields to specify the duration of the consumption timer.
-  - [ ] A "Start Session" button. This button should be disabled if the requested time is greater than the bank's balance.
-  - [ ] The `CountdownTimer` from the existing codebase will be used here.
+### Phase 2: Core Logic - The Advanced `CountdownTimer`
+- [ ] **Task 2.1**: Implement `CountdownTimer` with internal state management.
+  - [ ] Create `src/simpletimerbank/core/countdown_timer.py` with a `CountdownTimer` class.
+  - [ ] Define states: `IDLE`, `RUNNING`, `PAUSED`, `STOPPED`.
+  - [ ] It should also have a boolean flag: `is_overdrafting`.
+  - [ ] Implement `start(duration: int)`, `pause()`, `resume()`, and `stop()`.
+- [ ] **Task 2.2**: Implement the `tick` and overdraft logic.
+  - [ ] The timer's `tick` method (called every second) should decrement `remaining_seconds`.
+  - [ ] When `remaining_seconds` hits zero, the timer should set `is_overdrafting` to `True`.
+  - [ ] In overdraft mode, each `tick` must signal that 1 second should be withdrawn from the bank.
+- [ ] **Task 2.3**: Create `tests/test_countdown_timer.py` to test all state transitions, the countdown, and the overdraft signaling.
 
-### Phase 3: Advanced Features & UX (Upgrades)
-- [ ] **Task 3.1**: Implement Sound Notifications.
-  - [ ] When the consumption timer finishes, play a sound.
-  - [ ] This requires adding a sound file to the project assets.
-- [ ] **Task 3.2**: (Recommended) Add Transaction History.
-  - [ ] Log every deposit and withdrawal with a timestamp.
-  - [ ] Create a simple, scrollable view to show this history to the user.
-- [ ] **Task 3.3**: (Recommended) Add Quick Action Buttons.
-  - [ ] Add buttons for common deposits (e.g., "+30m", "+1h").
-  - [ ] Add buttons for common consumption sessions (e.g., "Spend 15m", "Spend 1h").
+### Phase 3: Core Logic - The `AppState` Orchestrator
+- [ ] **Task 3.1**: Implement the `AppState` class.
+  - [ ] Create `src/simpletimerbank/core/app_state.py` with an `AppState` class to manage `TimeBank` and `CountdownTimer` instances.
+- [ ] **Task 3.2**: Implement the core session logic in `AppState`.
+  - [ ] `start_session(duration: int)`: Withdraws from bank, then starts the timer. Fails if bank funds are too low.
+  - [ ] `stop_session()`: Stops the timer, gets its `remaining_seconds`, and deposits them back to the bank.
+  - [ ] `pause_session()` and `resume_session()`.
+- [ ] **Task 3.3**: Connect timer signals to `AppState` actions.
+  - [ ] Handle the overdraft signal from the timer to withdraw 1 second from the `TimeBank`.
+  - [ ] Handle the timer completion signal to trigger notifications.
+- [ ] **Task 3.4**: Add persistence to `AppState` to save/load the `TimeBank` balance.
+- [ ] **Task 3.5**: Update `tests/test_app_state.py` to test these interaction workflows.
+  - [ ] Add a specific test case to verify that stopping a session early correctly refunds the remaining time to the `TimeBank`.
+
+### Phase 4: GUI Implementation
+- [ ] **Task 4.1**: Design and implement the Bank UI section.
+- [ ] **Task 4.2**: Design and implement the Timer UI section.
+- [ ] **Task 4.3**: Connect GUI controls to the `AppState` methods.
+- [ ] **Task 4.4**: Ensure the UI updates based on signals from `AppState` (e.g., balance changes, timer ticks, overdraft mode visuals).
+
+### Phase 5: Final Features and Polish
+- [ ] **Task 5.1**: Implement desktop notifications.
+- [ ] **Task 5.2**: Refine UI/UX, package, and document the application.
 
 ## Executor's Feedback or Assistance Requests
-
 *This section will be updated by the Executor if any issues arise.*
 
 ## Reviewer's Audit & Feedback
-
 *This section is to be filled out by the Reviewer upon completion of all tasks.*
 
 ## Lessons
-
 *This section will be updated with key discoveries or solutions.*

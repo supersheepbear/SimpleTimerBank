@@ -9,34 +9,41 @@ This application provides a time "bank" where you can deposit or withdraw time, 
 
 ![Screenshot](https://raw.githubusercontent.com/supersheepbear/SimpleTimerBank/main/docs/assets/screenshot.png)
 
-## Quickstart
+## Download the Application
+
+1.  Go to the **[Releases Page](https://github.com/supersheepbear/SimpleTimerBank/releases/latest)**.
+2.  Under the "Assets" section, download the `SimpleTimerBank-vX.X.X.zip` file.
+3.  Unzip the downloaded file.
+4.  Run `SimpleTimerBank.exe` from inside the extracted folder.
+
+## For Developers
 
 This project uses [`uv`](https://github.com/astral-sh/uv) (version 0.2.22+ recommended) for package and environment management.
 
-1.  **Install `uv`**
+### 1. Install `uv`
 
-    If you don't have `uv` installed, run the appropriate command for your OS:
+If you don't have `uv` installed, run the appropriate command for your OS:
 
-    **macOS / Linux:**
-    ```sh
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
+**macOS / Linux:**
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-    **Windows:**
-    ```powershell
-    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
+**Windows:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
-2.  **Install Dependencies**
+### 2. Install Dependencies
 
-    ```sh
-    uv sync
-    ```
+```sh
+uv sync
+```
 
-3.  **Run the Application**
+### 3. Run the Application from Source
 
-    ```sh
-    uv run simpletimerbank
-    ```
+```sh
+uv run simpletimerbank
+```
 
 For more detailed information, please see the [full documentation](https://supersheepbear.github.io/SimpleTimerBank/).

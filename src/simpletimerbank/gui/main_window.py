@@ -140,19 +140,29 @@ class MainWindow(QMainWindow):
         self._amount_edit = QTimeEdit(self)
         self._amount_edit.setDisplayFormat("HH:mm:ss")
         self._amount_edit.setTime(QTime(0, 15, 0))
+        self._amount_edit.setStyleSheet("font-size: 14px; font-weight: bold;")
         amount_layout.addWidget(amount_label)
         amount_layout.addWidget(self._amount_edit)
         transaction_group_layout.addLayout(amount_layout)
 
         # Convenience buttons
-        convenience_layout = QHBoxLayout()
-        presets = {"15m": 15 * 60, "30m": 30 * 60, "1h": 60 * 60, "2h": 120 * 60}
-        for text, seconds in presets.items():
+        convenience_layout_add = QHBoxLayout()
+        add_presets = {"+15m": 15 * 60, "+30m": 30 * 60, "+1h": 60 * 60}
+        for text, seconds in add_presets.items():
             btn = QPushButton(text, self)
             btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-            btn.clicked.connect(lambda checked=False, secs=seconds: self._set_amount(secs))
-            convenience_layout.addWidget(btn)
-        transaction_group_layout.addLayout(convenience_layout)
+            btn.clicked.connect(lambda checked=False, secs=seconds: self._adjust_amount(secs))
+            convenience_layout_add.addWidget(btn)
+        transaction_group_layout.addLayout(convenience_layout_add)
+
+        convenience_layout_sub = QHBoxLayout()
+        sub_presets = {"-15m": -15 * 60, "-30m": -30 * 60, "-1h": -60 * 60}
+        for text, seconds in sub_presets.items():
+            btn = QPushButton(text, self)
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+            btn.clicked.connect(lambda checked=False, secs=seconds: self._adjust_amount(secs))
+            convenience_layout_sub.addWidget(btn)
+        transaction_group_layout.addLayout(convenience_layout_sub)
 
         # Direct operations
         direct_ops_layout = QHBoxLayout()
@@ -337,8 +347,25 @@ class MainWindow(QMainWindow):
         time = self._amount_edit.time()
         return time.hour() * 3600 + time.minute() * 60 + time.second()
 
-    def _set_amount(self, seconds: int) -> None:
-        h, rem = divmod(seconds, 3600)
+    def _adjust_amount(self, seconds_delta: int) -> None:
+        """Adjust the amount in the QTimeEdit by a relative number of seconds."""
+        current_time = self._amount_edit.time()
+        current_seconds = (current_time.hour() * 3600 +
+                           current_time.minute() * 60 +
+                           current_time.second())
+        
+        new_total_seconds = current_seconds + seconds_delta
+        
+        # Clamp the value between 0 and 23:59:59
+        if new_total_seconds < 0:
+            new_total_seconds = 0
+        
+        max_seconds = (23 * 3600) + (59 * 60) + 59
+        if new_total_seconds > max_seconds:
+            new_total_seconds = max_seconds
+            self.statusBar.showMessage("Amount cannot exceed 23:59:59.", 3000)
+            
+        h, rem = divmod(new_total_seconds, 3600)
         m, s = divmod(rem, 60)
         self._amount_edit.setTime(QTime(h, m, s))
 

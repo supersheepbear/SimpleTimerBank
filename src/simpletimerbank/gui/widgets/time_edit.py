@@ -1,35 +1,33 @@
-"""Time editing widget for SimpleTimerBank.
+"""Time edit widget for SimpleTimerBank.
 
-This module provides a widget for users to add or subtract time
-from their time balance.
+This module provides a widget for users to input and adjust a time
+duration, which can then be used to start a timer session.
 """
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Signal, Qt, QTime
 from PySide6.QtWidgets import (
     QWidget,
-    QHBoxLayout,
     QVBoxLayout,
-    QGridLayout,
-    QSpinBox,
+    QHBoxLayout,
     QPushButton,
+    QTimeEdit,
     QLabel,
-    QGroupBox,
+    QFrame,
 )
 
 
 class TimeEditWidget(QWidget):
-    """A widget for editing the time balance.
+    """A widget for inputting and adjusting a time duration for a session.
     
-    This widget provides spin boxes for hours, minutes, and seconds,
-    along with "Add Time", "Subtract Time", and "Set Time" buttons. It emits signals
-    when these buttons are clicked.
+    This widget provides controls to set, add, or subtract time from a
+    session duration field. The final duration can then be used to start
+    a timer. It emits signals when the user requests these actions.
     """
     
-    # Signals
-    add_time_requested = Signal(int)  # Emits total seconds to add
-    subtract_time_requested = Signal(int)  # Emits total seconds to subtract
-    set_time_requested = Signal(int) # Emits total seconds to set
-    
+    add_time_requested = Signal(int)
+    subtract_time_requested = Signal(int)
+    set_time_requested = Signal(int)
+
     def __init__(self, parent: QWidget = None) -> None:
         """Initialize the TimeEditWidget.
         
@@ -40,77 +38,77 @@ class TimeEditWidget(QWidget):
         """
         super().__init__(parent)
         
-        # Create main layout
+        # Main layout
         main_layout = QVBoxLayout(self)
         
-        # Group box for the time editor
-        group_box = QGroupBox("Modify Time Balance", self)
-        group_layout = QGridLayout(group_box)
+        # Header for the section
+        header_label = QLabel("Transaction Management", self)
+        header_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+        main_layout.addWidget(header_label)
         
-        # Spin boxes for H, M, S
-        self._hours_spin = self._create_spinbox(0, 999)
-        self._minutes_spin = self._create_spinbox(0, 59)
-        self._seconds_spin = self._create_spinbox(0, 59)
+        # Add a separator line
+        separator = QFrame(self)
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        main_layout.addWidget(separator)
+
+        # Time input field with label
+        time_input_layout = QVBoxLayout()
+        time_input_label = QLabel("Time Amount:", self)
+        time_input_label.setStyleSheet("margin-bottom: 2px;")
+        time_input_layout.addWidget(time_input_label)
         
-        # Labels
-        group_layout.addWidget(QLabel("Hours", self), 0, 0)
-        group_layout.addWidget(QLabel("Minutes", self), 0, 1)
-        group_layout.addWidget(QLabel("Seconds", self), 0, 2)
-        
-        group_layout.addWidget(self._hours_spin, 1, 0)
-        group_layout.addWidget(self._minutes_spin, 1, 1)
-        group_layout.addWidget(self._seconds_spin, 1, 2)
-        
-        # Buttons layout
+        self._time_edit = QTimeEdit(self)
+        self._time_edit.setDisplayFormat("HH:mm:ss")
+        self._time_edit.setTime(QTime(0, 30, 0))  # Default to 30 minutes
+        time_input_layout.addWidget(self._time_edit)
+        main_layout.addLayout(time_input_layout)
+
+        # Button layout
         button_layout = QHBoxLayout()
-        self._add_button = QPushButton("Add Time", self)
-        self._subtract_button = QPushButton("Subtract Time", self)
-        self._set_button = QPushButton("Set Time", self)
+        self._set_button = QPushButton("Set Bank Balance", self)
+        self._add_button = QPushButton("Deposit to Bank", self)
+        self._subtract_button = QPushButton("Withdraw from Bank", self)
+        
+        button_layout.addWidget(self._set_button)
         button_layout.addWidget(self._add_button)
         button_layout.addWidget(self._subtract_button)
-        button_layout.addWidget(self._set_button)
-        
-        group_layout.addLayout(button_layout, 2, 0, 1, 3)
-        
-        main_layout.addWidget(group_box)
-        self.setLayout(main_layout)
+        main_layout.addLayout(button_layout)
         
         # Connect signals
-        self._add_button.clicked.connect(self._on_add_clicked)
-        self._subtract_button.clicked.connect(self._on_subtract_clicked)
-        self._set_button.clicked.connect(self._on_set_clicked)
-    
-    def _create_spinbox(self, min_val: int, max_val: int) -> QSpinBox:
-        """Helper to create and configure a QSpinBox."""
-        spinbox = QSpinBox(self)
-        spinbox.setRange(min_val, max_val)
-        spinbox.setSingleStep(1)
-        spinbox.setButtonSymbols(QSpinBox.ButtonSymbols.PlusMinus)
-        spinbox.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        return spinbox
-    
-    def _get_total_seconds(self) -> int:
-        """Calculate total seconds from spin boxes."""
-        hours = self._hours_spin.value()
-        minutes = self._minutes_spin.value()
-        seconds = self._seconds_spin.value()
-        return (hours * 3600) + (minutes * 60) + seconds
-    
-    def _on_add_clicked(self) -> None:
-        """Handle add button click."""
-        total_seconds = self._get_total_seconds()
-        if total_seconds > 0:
-            self.add_time_requested.emit(total_seconds)
-    
-    def _on_subtract_clicked(self) -> None:
-        """Handle subtract button click."""
-        total_seconds = self._get_total_seconds()
-        if total_seconds > 0:
-            self.subtract_time_requested.emit(total_seconds)
+        self._set_button.clicked.connect(self._on_set_time)
+        self._add_button.clicked.connect(self._on_add_time)
+        self._subtract_button.clicked.connect(self._on_subtract_time)
+        
+        # Internal state for duration
+        self._session_duration_seconds = 30 * 60
 
-    def _on_set_clicked(self) -> None:
-        """Handle set button click."""
-        total_seconds = self._get_total_seconds()
-        # Allow setting time to 0
-        if total_seconds >= 0:
-            self.set_time_requested.emit(total_seconds) 
+    def _on_set_time(self) -> None:
+        """Handle the set time button click."""
+        time = self._time_edit.time()
+        seconds = time.hour() * 3600 + time.minute() * 60 + time.second()
+        self._session_duration_seconds = seconds
+        self.set_time_requested.emit(seconds)
+
+    def _on_add_time(self) -> None:
+        """Handle the add time button click."""
+        time = self._time_edit.time()
+        seconds = time.hour() * 3600 + time.minute() * 60 + time.second()
+        self.add_time_requested.emit(seconds)
+
+    def _on_subtract_time(self) -> None:
+        """Handle the subtract time button click."""
+        time = self._time_edit.time()
+        seconds = time.hour() * 3600 + time.minute() * 60 + time.second()
+        self.subtract_time_requested.emit(seconds)
+        
+    def get_duration_seconds(self) -> int:
+        """Get the currently configured session duration in seconds.
+        
+        Returns
+        -------
+        int
+            The duration in seconds.
+        """
+        time = self._time_edit.time()
+        return time.hour() * 3600 + time.minute() * 60 + time.second() 

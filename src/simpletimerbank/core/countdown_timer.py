@@ -1,147 +1,226 @@
 """Countdown timer management module.
 
-This module contains the CountdownTimer class responsible for managing
-the countdown timer functionality that consumes time balance.
+This module contains the CountdownTimer class, which encapsulates the logic
+for a countdown timer that supports starting, pausing, resuming, and stopping.
+It includes a key feature for "overdraft" mode.
 """
 
-import threading
 from enum import Enum
-from typing import Callable, Optional, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .time_balance import TimeBalance
+from typing import Callable, Optional, Union
 
 
 class TimerState(Enum):
     """Enumeration of possible timer states."""
-    STOPPED = "stopped"
-    RUNNING = "running" 
+    IDLE = "idle"
+    RUNNING = "running"
     PAUSED = "paused"
+    STOPPED = "stopped"
 
 
 class CountdownTimer:
-    """Manages countdown timer operations for the SimpleTimerBank application.
+    """Manages all operations for a countdown timer session.
     
-    This class handles starting, pausing, stopping the countdown timer
-    and coordinating with the TimeBalance to consume time.
+    This class handles the core timer mechanics, including state transitions
+    (IDLE, RUNNING, PAUSED, STOPPED). Its main responsibility is to manage the
+    countdown of a specified duration. When the countdown reaches zero, it
+    seamlessly transitions into "overdraft" mode, where it continues to tick
+    and signals that time should be withdrawn from an external source (like a
+    TimeBank). It also manages callbacks for ticks and completion events.
     """
     
-    def __init__(self, time_balance: Optional["TimeBalance"] = None) -> None:
-        """Initialize CountdownTimer.
+    def __init__(self) -> None:
+        """Initialize CountdownTimer in an IDLE state."""
+        self._state: TimerState = TimerState.IDLE
+        self._remaining_seconds: int = 0
+        self._initial_duration: int = 0
+        self._is_overdrafting: bool = False
+        self._tick_callback: Optional[Callable[[int], None]] = None
+        self._completion_callback: Optional[Callable[[], None]] = None
+    
+    def start(self, duration: int) -> None:
+        """Start a new countdown timer session with a specified duration.
+        
+        This resets the timer to the given duration and puts it in the RUNNING
+        state. It also resets the overdraft flag.
         
         Parameters
         ----------
-        time_balance : TimeBalance, optional
-            Reference to the time balance manager.
+        duration : int
+            The duration in seconds for the new timer session.
+            
+        Raises
+        ------
+        ValueError
+            If the duration is not a positive integer or if the timer is
+            already running.
         """
-        self._time_balance = time_balance
-        self._state = TimerState.STOPPED
-        self._timer: Optional[threading.Timer] = None
-        self._tick_callback: Optional[Callable[[int], None]] = None
+        if duration <= 0:
+            raise ValueError("Duration must be positive")
+            
+        if self._state == TimerState.RUNNING:
+            raise ValueError("Timer is already running")
+        
+        self._initial_duration = duration
+        self._remaining_seconds = duration
+        self._is_overdrafting = False
+        self._state = TimerState.RUNNING
     
-    def start(self) -> bool:
-        """Start the countdown timer.
+    def pause(self) -> None:
+        """Pause the currently running countdown timer.
+        
+        The timer's remaining time is preserved. Does nothing if the timer
+        is not currently running.
+
+        Raises
+        ------
+        ValueError
+            If the timer is not in the RUNNING state.
+        """
+        if self._state != TimerState.RUNNING:
+            if self._state == TimerState.PAUSED:
+                raise ValueError("Timer is already paused")
+            else:
+                raise ValueError("Timer is not running")
+        
+        self._state = TimerState.PAUSED
+    
+    def resume(self) -> None:
+        """Resume a timer that was previously paused.
+        
+        Sets the timer's state back to RUNNING. Does nothing if the timer
+        is not paused.
+        
+        Raises
+        ------
+        ValueError
+            If the timer is not in the PAUSED state.
+        """
+        if self._state != TimerState.PAUSED:
+            raise ValueError("Timer is not paused")
+        
+        self._state = TimerState.RUNNING
+    
+    def stop(self) -> None:
+        """Stop the timer session completely.
+        
+        This moves the timer to the STOPPED state. If the timer is stopped
+        before its duration is complete (i.e., not in overdraft), the
+        remaining seconds are preserved to allow for a refund. If stopped
+        during overdraft, the remaining time is set to zero.
+        
+        Raises
+        ------
+        ValueError
+            If the timer is already stopped or has never been started.
+        """
+        if self._state == TimerState.IDLE:
+            raise ValueError("Timer has not been started")
+            
+        if self._state == TimerState.STOPPED:
+            raise ValueError("Timer is already stopped")
+        
+        self._state = TimerState.STOPPED
+        
+        # If in overdraft, set remaining seconds to 0 (no refund)
+        if self._is_overdrafting:
+            self._remaining_seconds = 0
+            self._is_overdrafting = False
+    
+    def tick(self) -> Optional[int]:
+        """Process a single one-second tick of the timer.
+        
+        This is the core method that drives the countdown. It should be called
+        once per second. It decrements the remaining time. If the timer reaches
+        zero, it enables overdraft mode and fires the completion callback.
+        On subsequent ticks in overdraft mode, it returns a value to indicate
+        that one second should be withdrawn from the bank.
         
         Returns
         -------
-        bool
-            True if timer started successfully, False if insufficient balance.
+        Optional[int]
+            Returns 1 if a second of overdraft occurred, otherwise returns None.
         """
-        # If already running, don't start again
-        if self._state == TimerState.RUNNING:
-            return False
+        if self._state != TimerState.RUNNING:
+            return None
         
-        # Check if we have a time balance and it has time
-        if self._time_balance is None:
-            return False
-        
-        if self._time_balance.get_balance_seconds() <= 0:
-            return False
-        
-        # If we were paused, resume; otherwise start fresh
-        self._state = TimerState.RUNNING
-        self._schedule_next_tick()
-        return True
-    
-    def pause(self) -> None:
-        """Pause the countdown timer."""
-        if self._state == TimerState.RUNNING:
-            self._state = TimerState.PAUSED
-            self._cancel_timer()
-    
-    def stop(self) -> None:
-        """Stop the countdown timer and reset."""
-        self._state = TimerState.STOPPED
-        self._cancel_timer()
+        # If already in overdraft mode, signal to withdraw 1 second
+        if self._is_overdrafting:
+            if self._tick_callback:
+                self._tick_callback(0)
+            return 1
+            
+        # Normal countdown mode - decrement time
+        if self._remaining_seconds > 0:
+            self._remaining_seconds -= 1
+            
+            # Call tick callback with new remaining time
+            if self._tick_callback:
+                self._tick_callback(self._remaining_seconds)
+            
+            # Check if we've just reached zero
+            if self._remaining_seconds == 0:
+                self._is_overdrafting = True
+                # Notify that the initial countdown is complete
+                if self._completion_callback:
+                    self._completion_callback()
+            
+            return None
+            
+        return None
     
     def get_state(self) -> TimerState:
-        """Get current timer state.
+        """Get the current state of the timer.
         
         Returns
         -------
         TimerState
-            Current state of the timer.
+            The current state, e.g., IDLE, RUNNING, PAUSED, or STOPPED.
         """
         return self._state
     
-    def set_tick_callback(self, callback: Callable[[int], None]) -> None:
-        """Set callback function to be called every timer tick.
-        
-        Parameters
-        ----------
-        callback : Callable[[int], None]
-            Function to call with remaining seconds on each tick.
-        """
-        self._tick_callback = callback
-    
     def get_remaining_seconds(self) -> int:
-        """Get remaining time in seconds.
+        """Get the remaining seconds on the timer's initial duration.
+        
+        This value decrements during a normal countdown. In overdraft mode,
+        it will be 0.
         
         Returns
         -------
         int
-            Remaining time in seconds, or 0 if no time balance.
+            The number of seconds remaining in the countdown.
         """
-        if self._time_balance is None:
-            return 0
-        return self._time_balance.get_balance_seconds()
+        return self._remaining_seconds
     
-    def _schedule_next_tick(self) -> None:
-        """Schedule the next timer tick."""
-        if self._state == TimerState.RUNNING:
-            self._timer = threading.Timer(1.0, self._tick)
-            self._timer.start()
+    def is_overdrafting(self) -> bool:
+        """Check if the timer is currently in overdraft mode.
+        
+        Returns
+        -------
+        bool
+            True if the timer's initial duration has elapsed and it is now
+            counting up in overdraft; False otherwise.
+        """
+        return self._is_overdrafting
     
-    def _cancel_timer(self) -> None:
-        """Cancel the current timer."""
-        if self._timer is not None:
-            self._timer.cancel()
-            self._timer = None
+    def set_tick_callback(self, callback: Callable[[int], None]) -> None:
+        """Register a callback to be executed on each tick while running.
+        
+        Parameters
+        ----------
+        callback : Callable[[int], None]
+            A function to call with the remaining seconds on each tick.
+        """
+        self._tick_callback = callback
     
-    def _tick(self) -> None:
-        """Internal timer tick method that consumes time balance."""
-        # Only consume time if we're in running state
-        if self._state != TimerState.RUNNING:
-            return
+    def set_completion_callback(self, callback: Callable[[], None]) -> None:
+        """Register a callback to be executed when the timer first hits zero.
         
-        # Only tick if we have a time balance
-        if self._time_balance is None:
-            self.stop()
-            return
+        This callback is fired once at the exact moment the timer transitions
+        from its normal countdown to overdraft mode.
         
-        # Try to consume 1 second
-        success = self._time_balance.subtract_time(1)
-        
-        if not success or self._time_balance.get_balance_seconds() <= 0:
-            # No more time available, stop the timer
-            self.stop()
-            if self._tick_callback:
-                self._tick_callback(0)
-        else:
-            # Call callback with remaining time
-            if self._tick_callback:
-                self._tick_callback(self._time_balance.get_balance_seconds())
-            
-            # Schedule next tick if still running
-            if self._state == TimerState.RUNNING:
-                self._schedule_next_tick() 
+        Parameters
+        ----------
+        callback : Callable[[], None]
+            A function to call when the timer's duration is complete.
+        """
+        self._completion_callback = callback 

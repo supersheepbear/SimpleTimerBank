@@ -1,49 +1,81 @@
-# SimpleTimerBank
+# Simple Timer Bank
 
-A simple desktop timer application with a time balance, built with Python and PySide6.
+A sophisticated desktop application built with PySide6 that allows you to manage time as a resource. Bank your time, then spend it on focused work sessions using a flexible timer system. This tool is designed to help you stay productive by making you conscious of how you spend your time.
 
-[![Documentation](https://img.shields.io/badge/docs-published-blue)](https://supersheepbear.github.io/SimpleTimerBank/)
-[![License](https://img.shields.io/github/license/supersheepbear/SimpleTimerBank)](https://github.com/supersheepbear/SimpleTimerBank/blob/main/LICENSE)
+![SimpleTimerBank Screenshot](docs/assets/screenshot.png)
 
-This application provides a time "bank" where you can deposit or withdraw time, and then spend that balance using a built-in countdown timer.
+## Core Concepts
 
-![Screenshot](https://raw.githubusercontent.com/supersheepbear/SimpleTimerBank/main/docs/assets/screenshot.png)
+-   **Time as a Resource**: Think of time like money in a bank. You can deposit it, withdraw it, and spend it.
+-   **The Time Bank**: Your central repository of available time. The main display shows your current balance.
+-   **Transactions**: Instantly add or remove time from your bank using the "Manage Bank Balance" controls.
+-   **Timer Sessions**: "Spend" your banked time by running a countdown timer for a specific duration.
+-   **Overdraft Mode**: If a timer session runs out, it doesn't just stop. It automatically enters "Overdraft Mode" and begins withdrawing time directly from your bank balance, complete with sound and system notifications.
+-   **Refunds**: If you stop a timer session early, the unused time is instantly refunded to your bank.
 
-## Download the Application
+## Features
 
-1.  Click on the following link to download the application zip file:
-    **[Download SimpleTimerBank_v1.0.0.zip](https://github.com/supersheepbear/SimpleTimerBank/raw/main/assets/SimpleTimerBank_v1.0.0.zip)**
-2.  Unzip the downloaded file.
-3.  Run `SimpleTimerBank.exe` from inside the extracted folder.
+-   **Digital Clock Displays**: Clear, easy-to-read displays for both your bank balance and the active timer.
+-   **Intuitive Transaction Controls**:
+    -   Deposit, instantly withdraw, or set your bank balance to a specific value.
+    -   Use relative preset buttons (`+15m`, `-30m`, etc.) to quickly adjust the transaction amount.
+-   **Flexible Timer Controls**: Start, pause, resume, and stop timer sessions with clear, expanding buttons.
+-   **Audio-Visual Alerts**: Receive non-blocking system notifications with custom sounds for key events like overdraft activation and bank depletion.
+-   **Persistent State**: Your time bank balance is automatically saved when you close the application and reloaded on startup.
+-   **Polished UI**: A clean, visually organized interface with distinct sections for different actions.
 
-## For Developers
+## Installation
 
-This project uses [`uv`](https://github.com/astral-sh/uv) (version 0.2.22+ recommended) for package and environment management.
+The recommended way to install Simple Timer Bank is via `pip` or `uv`:
 
-### 1. Install `uv`
+```bash
+# Using pip
+pip install simpletimerbank
 
-If you don't have `uv` installed, run the appropriate command for your OS:
-
-**macOS / Linux:**
-```sh
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Or using uv
+uv add simpletimerbank
 ```
 
-**Windows:**
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+## Usage
+
+Once installed, you can run the application from your terminal:
+
+```bash
+simpletimerbank
 ```
 
-### 2. Install Dependencies
+## Development Setup
 
-```sh
-uv sync
-```
+If you wish to contribute to the project, follow these steps to set up a development environment.
 
-### 3. Run the Application from Source
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/your-username/SimpleTimerBank.git
+    cd SimpleTimerBank
+    ```
 
-```sh
-uv run simpletimerbank
-```
+2.  **Set up a Virtual Environment and Install**:
+    This project uses `uv` for package management.
+    ```bash
+    # Create a virtual environment
+    uv venv
+    # Activate it (example for Windows PowerShell)
+    .venv\Scripts\Activate.ps1
+    # Install the project in editable mode with its dependencies
+    uv pip install -e .
+    ```
 
-For more detailed information, please see the [full documentation](https://supersheepbear.github.io/SimpleTimerBank/).
+3.  **Run the Application from Source**:
+    ```bash
+    python -m src.simpletimerbank.main
+    ```
+
+## Development Tasks
+
+-   **Run Tests**: `make test` or `uv run pytest`
+-   **Build Documentation**: `make doc`
+-   **Publish Documentation**: `make publish-docs`
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

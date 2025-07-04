@@ -14,6 +14,6 @@ countdown_timer : CountdownTimer
     Handles countdown timer logic and state management.
 persistence : PersistenceService
     Manages data loading and saving to persistent storage.
-app_state : AppStateManager
+app_state : AppState
     Coordinates application state across all components.
 """ 

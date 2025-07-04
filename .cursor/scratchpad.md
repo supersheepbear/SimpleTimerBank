@@ -57,18 +57,18 @@ The project will be implemented in phases, focusing on building a robust core lo
 - [x] **Task 2.3**: Create `tests/test_countdown_timer.py` to test all state transitions, the countdown, and the overdraft signaling.
 
 ### Phase 3: Core Logic - The `AppState` Orchestrator
-- [ ] **Task 3.1**: Implement the `AppState` class.
-  - [ ] Create `src/simpletimerbank/core/app_state.py` with an `AppState` class to manage `TimeBank` and `CountdownTimer` instances.
-- [ ] **Task 3.2**: Implement the core session logic in `AppState`.
-  - [ ] `start_session(duration: int)`: Withdraws from bank, then starts the timer. Fails if bank funds are too low.
-  - [ ] `stop_session()`: Stops the timer, gets its `remaining_seconds`, and deposits them back to the bank.
-  - [ ] `pause_session()` and `resume_session()`.
-- [ ] **Task 3.3**: Connect timer signals to `AppState` actions.
-  - [ ] Handle the overdraft signal from the timer to withdraw 1 second from the `TimeBank`.
-  - [ ] Handle the timer completion signal to trigger notifications.
-- [ ] **Task 3.4**: Add persistence to `AppState` to save/load the `TimeBank` balance.
-- [ ] **Task 3.5**: Update `tests/test_app_state.py` to test these interaction workflows.
-  - [ ] Add a specific test case to verify that stopping a session early correctly refunds the remaining time to the `TimeBank`.
+- [x] **Task 3.1**: Implement the `AppState` class.
+  - [x] Create `src/simpletimerbank/core/app_state.py` with an `AppState` class to manage `TimeBank` and `CountdownTimer` instances.
+- [x] **Task 3.2**: Implement the core session logic in `AppState`.
+  - [x] `start_session(duration: int)`: Withdraws from bank, then starts the timer. Fails if bank funds are too low.
+  - [x] `stop_session()`: Stops the timer, gets its `remaining_seconds`, and deposits them back to the bank.
+  - [x] `pause_session()` and `resume_session()`.
+- [x] **Task 3.3**: Connect timer signals to `AppState` actions.
+  - [x] Handle the overdraft signal from the timer to withdraw 1 second from the `TimeBank`.
+  - [x] Handle the timer completion signal to trigger notifications.
+- [x] **Task 3.4**: Add persistence to `AppState` to save/load the `TimeBank` balance.
+- [x] **Task 3.5**: Update `tests/test_app_state.py` to test these interaction workflows.
+  - [x] Add a specific test case to verify that stopping a session early correctly refunds the remaining time to the `TimeBank`.
 
 ### Phase 4: GUI Implementation
 - [ ] **Task 4.1**: Design and implement the Bank UI section.
@@ -119,6 +119,31 @@ The implementation addresses the key challenges mentioned in the plan:
 All tests are passing with 100% coverage of the new functionality.
 
 Next, I will begin implementing Phase 3 - the `AppState` Orchestrator.
+
+### 2023-10-17: Phase 3 Complete
+Phase 3 has been successfully completed. The `AppState` class has been implemented to orchestrate the interactions between the `TimeBank` and `CountdownTimer`. All tests are passing.
+
+The new `AppState` implementation includes:
+- Session management with `start_session()`, `pause_session()`, `resume_session()`, and `stop_session()` methods
+- Proper handling of timer signals, including overdraft handling and time refunds
+- Integration with the `PersistenceService` to save and load the bank balance
+- Event callback hooks for timer ticks and timer completion notifications
+
+Key features implemented:
+- The session logic now properly handles the timer lifecycle and bank transactions as atomic operations
+- When a session is stopped early, remaining time is correctly refunded to the bank
+- When the timer enters overdraft mode, the app state withdraws time from the bank on each tick
+- When the bank balance is depleted, the timer is automatically stopped
+
+The `AppState` tests validate all these workflows with comprehensive test cases, including a specific test to verify the refund mechanism. All tests are passing with good coverage.
+
+The implementation successfully addresses the key challenges from the plan:
+- Timer-bank interactions are now properly orchestrated
+- The overdraft mechanism withdraws time from the bank appropriately
+- Transactions (start, stop, refund) are handled atomically
+- The UI can be properly decoupled with the callback system
+
+Next, I would begin implementing Phase 4 - GUI Implementation.
 
 ## Reviewer's Audit & Feedback
 *This section is to be filled out by the Reviewer upon completion of all tasks.*

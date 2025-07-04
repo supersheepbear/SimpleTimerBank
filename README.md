@@ -1,17 +1,17 @@
-# Simple Timer Bank
+# Simple Timer Bank 🏦
 
-A sophisticated desktop application built with PySide6 that allows you to manage time as a resource. Bank your time, then spend it on focused work sessions using a flexible timer system. This tool is designed to help you stay productive by making you conscious of how you spend your time.
+Ever feel like you've *earned* some time to play video games 🎮, watch movies 🍿, or just relax, but have trouble tracking it?
+
+**Simple Timer Bank** is your personal time bank for guilt-free leisure. Earn time by being productive, deposit it into your "bank," and then spend it whenever you want on the fun stuff.
 
 ![SimpleTimerBank Screenshot](docs/assets/screenshot.png)
 
-## Core Concepts
+## How It Works 🤔
 
--   **Time as a Resource**: Think of time like money in a bank. You can deposit it, withdraw it, and spend it.
--   **The Time Bank**: Your central repository of available time. The main display shows your current balance.
--   **Transactions**: Instantly add or remove time from your bank using the "Manage Bank Balance" controls.
--   **Timer Sessions**: "Spend" your banked time by running a countdown timer for a specific duration.
--   **Overdraft Mode**: If a timer session runs out, it doesn't just stop. It automatically enters "Overdraft Mode" and begins withdrawing time directly from your bank balance, complete with sound and system notifications.
--   **Refunds**: If you stop a timer session early, the unused time is instantly refunded to your bank.
+-   **Earn & Bank Your Time**: Finished a task? Studied for an hour? Deposit that time into your bank. You've earned it!
+-   **Start the Fun Timer**: Ready to play? Start a timer session to "withdraw" and spend your banked time.
+-   **Go Into Overdraft**: Can't stop mid-game? No problem. The timer will go into "overdraft," borrowing from your main bank balance so you can finish your round. You'll get a notification, but the fun doesn't have to stop immediately.
+-   **Stop Early, Get a Refund**: End your session early? The unused time is automatically refunded to your bank.
 
 ## Features
 

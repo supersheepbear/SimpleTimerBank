@@ -5,7 +5,7 @@ to control the countdown timer.
 """
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QGroupBox, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QGroupBox, QVBoxLayout, QLabel, QSizePolicy
 
 from simpletimerbank.core.countdown_timer import TimerState
 
@@ -44,6 +44,12 @@ class TimerControlWidget(QWidget):
         self._start_button = QPushButton("Start Timer", self)
         self._pause_button = QPushButton("Pause Timer", self)
         self._stop_button = QPushButton("Stop Timer & Refund", self)
+        
+        # Set size policy to make buttons expand
+        size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self._start_button.setSizePolicy(size_policy)
+        self._pause_button.setSizePolicy(size_policy)
+        self._stop_button.setSizePolicy(size_policy)
         
         button_layout.addWidget(self._start_button)
         button_layout.addWidget(self._pause_button)

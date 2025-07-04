@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QPushButton,
     QTimeEdit,
+    QSizePolicy,
 )
 import os
 
@@ -125,6 +126,11 @@ class MainWindow(QMainWindow):
                 subcontrol-position: top center;
                 padding: 0 3px;
             }
+            QPushButton {
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px 12px;
+            }
         """)
         transaction_group_layout = QVBoxLayout()
 
@@ -143,6 +149,7 @@ class MainWindow(QMainWindow):
         presets = {"15m": 15 * 60, "30m": 30 * 60, "1h": 60 * 60, "2h": 120 * 60}
         for text, seconds in presets.items():
             btn = QPushButton(text, self)
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             btn.clicked.connect(lambda checked=False, secs=seconds: self._set_amount(secs))
             convenience_layout.addWidget(btn)
         transaction_group_layout.addLayout(convenience_layout)
@@ -152,6 +159,12 @@ class MainWindow(QMainWindow):
         self._deposit_button = QPushButton("Deposit", self)
         self._withdraw_button = QPushButton("Instant Withdraw", self)
         self._set_balance_button = QPushButton("Set Balance", self)
+
+        size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self._deposit_button.setSizePolicy(size_policy)
+        self._withdraw_button.setSizePolicy(size_policy)
+        self._set_balance_button.setSizePolicy(size_policy)
+
         direct_ops_layout.addWidget(self._deposit_button)
         direct_ops_layout.addWidget(self._withdraw_button)
         direct_ops_layout.addWidget(self._set_balance_button)
@@ -175,6 +188,11 @@ class MainWindow(QMainWindow):
                 subcontrol-origin: margin;
                 subcontrol-position: top center;
                 padding: 0 3px;
+            }
+            QPushButton {
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px 12px;
             }
         """)
         main_layout.addWidget(self._timer_control)

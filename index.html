@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#welcome-to-simpletimerbank" class="md-skip">
+        <a href="#welcome-to-simple-timer-bank" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Welcome to SimpleTimerBank
+              Welcome to Simple Timer Bank
             
           </span>
         </div>
@@ -250,7 +250,7 @@
   
   
   <span class="md-ellipsis">
-    Welcome to SimpleTimerBank
+    Welcome to Simple Timer Bank
     
   </span>
   
@@ -263,7 +263,7 @@
   
   
   <span class="md-ellipsis">
-    Welcome to SimpleTimerBank
+    Welcome to Simple Timer Bank
     
   </span>
   
@@ -286,9 +286,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#core-features" class="md-nav__link">
+  <a href="#the-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
-      Core Features
+      The Philosophy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
     </span>
   </a>
   
@@ -426,9 +435,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#core-features" class="md-nav__link">
+  <a href="#the-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
-      Core Features
+      The Philosophy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
     </span>
   </a>
   
@@ -462,19 +480,31 @@
   
 
 
-<h1 id="welcome-to-simpletimerbank">Welcome to SimpleTimerBank</h1>
-<p><strong>SimpleTimerBank</strong> is a focused, easy-to-use desktop application designed for effective time management. It's built on the concept of a time "bank," where you can deposit or withdraw time, and then spend that balance using a built-in countdown timer.</p>
-<p>This tool is perfect for anyone who uses time-blocking techniques, needs to track work hours against a budget, or simply wants a more tangible way to manage their daily available time.</p>
-<p><img alt="SimpleTimerBank Screenshot" src="https://raw.githubusercontent.com/supersheepbear/SimpleTimerBank/main/docs/assets/screenshot.png" /></p>
-<h2 id="core-features">Core Features</h2>
+<h1 id="welcome-to-simple-timer-bank">Welcome to Simple Timer Bank</h1>
+<p><strong>Simple Timer Bank</strong> is a sophisticated desktop application designed to help you manage your time like a financial asset. By "banking" your time, you can make conscious decisions about how you spend it, improving focus and productivity.</p>
+<p>The application is built using Python and the PySide6 framework, featuring a polished, intuitive user interface.</p>
+<p><img alt="SimpleTimerBank Screenshot" src="assets/screenshot.png" /></p>
+<h2 id="the-philosophy">The Philosophy</h2>
+<p>The core idea is to treat time as a finite resource. Before you can "spend" time on an activity, you must first "deposit" it into your bank. This simple act makes you more aware of your time allocation. The timer lets you spend your banked time on focused sessions, and the overdraft feature ensures you're aware when you exceed your planned duration.</p>
+<h2 id="key-features">Key Features</h2>
 <ul>
-<li><strong>Time Balance</strong>: Easily add or subtract time from your central time bank. The balance is always visible and is saved automatically when you close the app.</li>
-<li><strong>Countdown Timer</strong>: Start a countdown timer that consumes your time balance in real-time. Pause or stop the timer at any moment.</li>
-<li><strong>Data Persistence</strong>: Your remaining time balance is saved when you exit and automatically reloaded the next time you start the application.</li>
-<li><strong>Standalone Executable</strong>: The entire application is packaged into a single folder for easy execution, with no installation required.</li>
+<li><strong>Visual Time Bank</strong>: A large, digital display shows your exact time balance (HH:MM:SS).</li>
+<li><strong>Full-Featured Timer</strong>: A second digital display shows the active timer, which can be started, paused, resumed, and stopped.</li>
+<li><strong>Transaction Management</strong>:<ul>
+<li>Deposit or instantly withdraw time from your bank.</li>
+<li>Set your balance directly to a specific value.</li>
+<li>Use relative preset buttons (<code>+15m</code>, <code>-30m</code>, <code>+1h</code>) to quickly modify the transaction amount.</li>
+</ul>
+</li>
+<li><strong>Automatic Overdraft &amp; Refunds</strong>:<ul>
+<li>When a timer finishes, it automatically enters <strong>Overdraft Mode</strong>, withdrawing from your main balance and triggering a non-blocking system notification with sound.</li>
+<li>If you stop a timer early, the unused time is instantly <strong>refunded</strong> to your bank.</li>
+</ul>
+</li>
+<li><strong>Data Persistence</strong>: Your balance is always saved on exit and reloaded on start.</li>
 </ul>
 <h2 id="getting-started">Getting Started</h2>
-<p>Ready to try it out? Head over to the <strong><a href="usage/">Usage Guide</a></strong> to learn how to run and build the application.</p>
+<p>Ready to take control of your time? Head over to the <strong><a href="usage/">Usage Guide</a></strong> to learn how to install and use the application.</p>
 
 
 

@@ -243,7 +243,7 @@
   
   
   <span class="md-ellipsis">
-    Welcome to SimpleTimerBank
+    Welcome to Simple Timer Bank
     
   </span>
   
@@ -310,46 +310,73 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Installation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-from-source" class="md-nav__link">
+  <a href="#running-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Running from Source
+      Running the Application
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#building-the-executable" class="md-nav__link">
+  <a href="#how-to-use-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Building the Executable
+      How to Use the Application
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Building the Executable">
+    <nav class="md-nav" aria-label="How to Use the Application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-fast-starting-folder-mode-for-development" class="md-nav__link">
+  <a href="#1-your-time-bank-balance" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Fast-Starting Folder Mode (for Development)
+      1. Your Time Bank Balance
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-single-file-mode-for-distribution" class="md-nav__link">
+  <a href="#2-active-timer" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Single-File Mode (for Distribution)
+      2. Active Timer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-manage-bank-balance" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Manage Bank Balance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-timer-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Timer Controls
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overdraft-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overdraft Mode
     </span>
   </a>
   
@@ -461,46 +488,73 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Installation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-from-source" class="md-nav__link">
+  <a href="#running-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Running from Source
+      Running the Application
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#building-the-executable" class="md-nav__link">
+  <a href="#how-to-use-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Building the Executable
+      How to Use the Application
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Building the Executable">
+    <nav class="md-nav" aria-label="How to Use the Application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-fast-starting-folder-mode-for-development" class="md-nav__link">
+  <a href="#1-your-time-bank-balance" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Fast-Starting Folder Mode (for Development)
+      1. Your Time Bank Balance
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-single-file-mode-for-distribution" class="md-nav__link">
+  <a href="#2-active-timer" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Single-File Mode (for Distribution)
+      2. Active Timer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-manage-bank-balance" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Manage Bank Balance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-timer-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Timer Controls
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overdraft-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overdraft Mode
     </span>
   </a>
   
@@ -531,43 +585,79 @@
 
 
 <h1 id="usage-guide">Usage Guide</h1>
-<p>This guide covers how to run the SimpleTimerBank application from source and how to build the standalone executable.</p>
-<h2 id="prerequisites">Prerequisites</h2>
-<ul>
-<li>Python 3.9+</li>
-<li><a href="https://github.com/astral-sh/uv">uv</a> build tool</li>
-<li><code>make</code> (optional, for convenience)</li>
-</ul>
-<h2 id="running-from-source">Running from Source</h2>
-<p>Running the application directly from the source code is the quickest way to get started.</p>
+<p>This guide provides detailed instructions on how to install and use the Simple Timer Bank application.</p>
+<h2 id="installation">Installation</h2>
+<p>This project uses <code>uv</code> for dependency and environment management.</p>
 <ol>
 <li>
-<p><strong>Install Dependencies</strong>:
-    First, sync the project dependencies using <code>uv</code>.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync
+<p><strong>Clone the Repository</strong>:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/your-username/SimpleTimerBank.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>SimpleTimerBank
 </code></pre></div></p>
 </li>
 <li>
-<p><strong>Run the Application</strong>:
-    Use the <code>uv run</code> command to execute the main script.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>simpletimerbank
-</code></pre></div>
-    The application GUI should appear on your screen.</p>
+<p><strong>Create and Activate Virtual Environment</strong>:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Create the venv</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>venv
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Activate the venv (Windows PowerShell)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>.venv<span class="se">\S</span>cripts<span class="se">\A</span>ctivate.ps1
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># On macOS/Linux, you would use:</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># source .venv/bin/activate</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Install the Application</strong>:
+    Install the project in editable mode, which will also pull in all required dependencies like <code>PySide6</code> and <code>playsound</code>.
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div></p>
 </li>
 </ol>
-<h2 id="building-the-executable">Building the Executable</h2>
-<p>The project is configured to build a standalone executable (<code>.exe</code> on Windows) that bundles the application and all its dependencies.</p>
-<p>We support two build modes:</p>
-<h3 id="1-fast-starting-folder-mode-for-development">1. Fast-Starting Folder Mode (for Development)</h3>
-<p>This is the <strong>recommended</strong> mode for development and testing. It creates a folder containing the <code>.exe</code> and all its dependencies. This version starts almost instantly.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>build-exe
+<h2 id="running-the-application">Running the Application</h2>
+<p>Once the installation is complete, you can run the application with a single command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>src.simpletimerbank.main
 </code></pre></div>
-<p>After the build completes, you will find the executable inside the <code>dist/SimpleTimerBank/</code> directory.</p>
-<h3 id="2-single-file-mode-for-distribution">2. Single-File Mode (for Distribution)</h3>
-<p>This mode creates a single, self-contained <code>.exe</code> file. This is convenient for sharing, but be aware that it will have a <strong>slower startup time</strong> as it needs to decompress itself into a temporary directory every time it runs.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>build-exe-dist
-</code></pre></div>
-<p>After the build completes, you will find <code>SimpleTimerBank.exe</code> inside the <code>dist/</code> directory. </p>
+<p>The application window will appear, ready for use.</p>
+<hr />
+<h2 id="how-to-use-the-application">How to Use the Application</h2>
+<p>The interface is divided into three main sections, from top to bottom.</p>
+<h3 id="1-your-time-bank-balance">1. Your Time Bank Balance</h3>
+<p>This top section shows a large, digital display of your total available time. This is your "balance" that you can spend or add to.</p>
+<h3 id="2-active-timer">2. Active Timer</h3>
+<p>This display shows the countdown of a currently running timer session. It remains at <code>00:00:00</code> until you start a timer.</p>
+<h3 id="3-manage-bank-balance">3. Manage Bank Balance</h3>
+<p>This section is for performing instant transactions on your time bank.</p>
+<ul>
+<li><strong>Amount</strong>: This input field is where you set the time value for your transactions. You can type a value (HH:MM:SS) or use the preset buttons to adjust it.</li>
+<li><strong>Preset Buttons</strong>:<ul>
+<li><code>+15m</code>, <code>+30m</code>, <code>+1h</code>: Click these to add time to the <strong>Amount</strong> field.</li>
+<li><code>-15m</code>, <code>-30m</code>, <code>-1h</code>: Click these to subtract time from the <strong>Amount</strong> field. The amount will not go below zero.</li>
+</ul>
+</li>
+<li><strong>Action Buttons</strong>:<ul>
+<li><strong>Deposit</strong>: Instantly adds the value in the <strong>Amount</strong> field to your main bank balance.</li>
+<li><strong>Instant Withdraw</strong>: Instantly subtracts the value from your bank balance.</li>
+<li><strong>Set Balance</strong>: Sets your bank balance directly to the value in the <strong>Amount</strong> field.</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-timer-controls">4. Timer Controls</h3>
+<p>This section is for starting and managing a timed session, which "spends" the time from your bank.</p>
+<ul>
+<li><strong>Start Timer</strong>: Begins a countdown using the duration set in the <strong>Amount</strong> field. This amount is immediately subtracted from your bank balance.</li>
+<li><strong>Pause Timer</strong>: Pauses a running timer. The button will be disabled, and the "Start Timer" button will change to "Resume Timer".</li>
+<li><strong>Stop Timer &amp; Refund</strong>: Stops the timer immediately and refunds any unused time back to your bank balance. For example, if you start a 1-hour timer and stop it after 10 minutes, 50 minutes will be deposited back into your bank.</li>
+</ul>
+<h3 id="overdraft-mode">Overdraft Mode</h3>
+<p>This is a key feature of the application.</p>
+<ul>
+<li>When your <strong>Active Timer</strong> counts down to zero, it doesn't just stop. It automatically enters Overdraft Mode.</li>
+<li>You will receive a non-blocking system notification (with a sound) alerting you to this.</li>
+<li>The Active Timer display will turn red, and a text indicator will appear.</li>
+<li>The timer will start counting <strong>up</strong>, and for every second that passes, one second will be withdrawn from your <strong>Time Bank Balance</strong>.</li>
+<li>To stop the overdraft, you must click the <strong>Stop Timer &amp; Refund</strong> button (though in this case, there is no time to refund). The timer will stop, and your bank balance will be whatever remains. </li>
+</ul>
 
 
 

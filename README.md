@@ -11,10 +11,10 @@ This application provides a time "bank" where you can deposit or withdraw time, 
 
 ## Download the Application
 
-1.  Go to the **[Releases Page](https://github.com/supersheepbear/SimpleTimerBank/releases/latest)**.
-2.  Under the "Assets" section, download the `SimpleTimerBank-vX.X.X.zip` file.
-3.  Unzip the downloaded file.
-4.  Run `SimpleTimerBank.exe` from inside the extracted folder.
+1.  Click on the following link to download the application zip file:
+    **[Download SimpleTimerBank_v1.0.0.zip](https://github.com/supersheepbear/SimpleTimerBank/raw/main/assets/SimpleTimerBank_v1.0.0.zip)**
+2.  Unzip the downloaded file.
+3.  Run `SimpleTimerBank.exe` from inside the extracted folder.
 
 ## For Developers
 

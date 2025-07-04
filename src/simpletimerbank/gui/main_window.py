@@ -61,15 +61,54 @@ class MainWindow(QMainWindow):
         
         # --- Bank Balance Section ---
         balance_section = QVBoxLayout()
+        
+        # Bank balance header with explanation
         bank_header_layout = QVBoxLayout()
         bank_header = QLabel("Your Time Bank Balance", self)
         bank_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 5px;")
+        
         bank_header_layout.addWidget(bank_header)
         balance_section.addLayout(bank_header_layout)
+        
         self._time_display = TimeDisplayWidget(self, font_family=font_family)
         balance_section.addWidget(self._time_display)
         main_layout.addLayout(balance_section)
         
+        # Add separator
+        separator = QFrame(self)
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        main_layout.addWidget(separator)
+        
+        # --- Timer Countdown Section ---
+        withdrawal_section = QVBoxLayout()
+        
+        timer_header = QLabel("Active Timer", self)
+        timer_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
+        withdrawal_section.addWidget(timer_header)
+        
+        self._timer_countdown_label = QLabel("00:00:00", self)
+        timer_font = QFont(font_family, 36, QFont.Weight.Bold)  # Use same font as bank balance
+        self._timer_countdown_label.setFont(timer_font)
+        self._timer_countdown_label.setStyleSheet("""
+            color: #4CAF50;
+            background-color: #1E1E1E;
+            border: 2px solid #4A4A4A;
+            border-radius: 10px;
+            padding: 10px;
+        """)
+        self._timer_countdown_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        withdrawal_section.addWidget(self._timer_countdown_label)
+        
+        # Overdraft indicator
+        self._overdraft_indicator = QLabel("", self)
+        self._overdraft_indicator.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._overdraft_indicator.setStyleSheet("font-weight: bold; color: #FF4500; font-size: 12px;")
+        self._overdraft_indicator.setVisible(False)
+        withdrawal_section.addWidget(self._overdraft_indicator)
+        
+        main_layout.addLayout(withdrawal_section)
+
         # --- Transaction Controls ---
         transaction_group = QGroupBox("Manage Bank Balance")
         transaction_group.setStyleSheet("""
@@ -85,10 +124,6 @@ class MainWindow(QMainWindow):
                 subcontrol-origin: margin;
                 subcontrol-position: top center;
                 padding: 0 3px;
-            }
-            QPushButton {
-                font-size: 13px;
-                padding: 8px;
             }
         """)
         transaction_group_layout = QVBoxLayout()
@@ -125,41 +160,6 @@ class MainWindow(QMainWindow):
         transaction_group.setLayout(transaction_group_layout)
         main_layout.addWidget(transaction_group)
         
-        # Add separator
-        separator = QFrame(self)
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setFrameShadow(QFrame.Shadow.Sunken)
-        main_layout.addWidget(separator)
-        
-        # --- Timer Countdown Section ---
-        withdrawal_section = QVBoxLayout()
-        
-        timer_header = QLabel("Active Timer", self)
-        timer_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
-        withdrawal_section.addWidget(timer_header)
-        
-        self._timer_countdown_label = QLabel("00:00:00", self)
-        timer_font = QFont(font_family, 36, QFont.Weight.Bold)  # Use same font as bank balance
-        self._timer_countdown_label.setFont(timer_font)
-        self._timer_countdown_label.setStyleSheet("""
-            color: #4CAF50;
-            background-color: #1E1E1E;
-            border: 2px solid #4A4A4A;
-            border-radius: 10px;
-            padding: 10px;
-        """)
-        self._timer_countdown_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        withdrawal_section.addWidget(self._timer_countdown_label)
-        
-        # Overdraft indicator
-        self._overdraft_indicator = QLabel("", self)
-        self._overdraft_indicator.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._overdraft_indicator.setStyleSheet("font-weight: bold; color: #FF4500; font-size: 12px;")
-        self._overdraft_indicator.setVisible(False)
-        withdrawal_section.addWidget(self._overdraft_indicator)
-        
-        main_layout.addLayout(withdrawal_section)
-        
         # --- Timed Withdrawal Controls ---
         self._timer_control = TimerControlWidget(self)
         self._timer_control.setStyleSheet("""
@@ -175,10 +175,6 @@ class MainWindow(QMainWindow):
                 subcontrol-origin: margin;
                 subcontrol-position: top center;
                 padding: 0 3px;
-            }
-            QPushButton {
-                font-size: 13px;
-                padding: 8px;
             }
         """)
         main_layout.addWidget(self._timer_control)

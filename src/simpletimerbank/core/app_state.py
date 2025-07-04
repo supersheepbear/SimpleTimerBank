@@ -9,6 +9,7 @@ from typing import Callable, Optional, Dict, Any
 from .time_bank import TimeBank
 from .countdown_timer import CountdownTimer, TimerState
 from .persistence import PersistenceService
+from .notification_service import NotificationService
 
 
 class AppState:
@@ -24,6 +25,7 @@ class AppState:
         self._time_bank = TimeBank()
         self._countdown_timer = CountdownTimer()
         self._persistence_service = PersistenceService()
+        self._notification_service = NotificationService()
         
         # Set up callback handlers
         self._countdown_timer.set_completion_callback(self._on_timer_completion)
@@ -102,6 +104,16 @@ class AppState:
             Reference to PersistenceService instance.
         """
         return self._persistence_service
+    
+    def get_notification_service(self) -> NotificationService:
+        """Get reference to the notification service.
+        
+        Returns
+        -------
+        NotificationService
+            Reference to NotificationService instance.
+        """
+        return self._notification_service
     
     def start_session(self, duration_seconds: int) -> bool:
         """Start a new timer session with the specified duration.
@@ -208,6 +220,9 @@ class AppState:
             bank_balance = self._time_bank.get_balance()
             if bank_balance > 0:
                 self._time_bank.set_balance(0)
+                
+            # Notify user that bank is depleted
+            self._notification_service.notify_bank_depleted()
             
             # Stop the timer
             try:
@@ -221,6 +236,10 @@ class AppState:
         
         This is called when the timer reaches zero and enters overdraft mode.
         """
+        # Send notification
+        self._notification_service.notify_timer_completed()
+        
+        # Call user-provided callback if set
         if self._completion_callback:
             self._completion_callback()
     
@@ -367,6 +386,16 @@ class AppStateManager:
             Function to call with remaining seconds on each tick.
         """
         self._app_state.set_timer_tick_callback(callback)
+    
+    def set_timer_completion_callback(self, callback: Callable[[], None]) -> None:
+        """Set callback function for timer completion.
+        
+        Parameters
+        ----------
+        callback : Callable[[], None]
+            Function to call when timer completes initial countdown.
+        """
+        self._app_state.set_timer_completion_callback(callback)
     
     def set_qt_timer(self, timer) -> None:
         """Set the QTimer instance used for timer ticks.

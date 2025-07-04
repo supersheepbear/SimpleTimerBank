@@ -4,7 +4,7 @@ This module provides the main application window, which assembles all
 the GUI components and connects them to the core business logic.
 """
 
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtCore import QTimer, Qt, QTime
 from PySide6.QtGui import QCloseEvent, QFontDatabase, QColor, QPalette, QFont
 from PySide6.QtWidgets import (
     QMainWindow,
@@ -15,13 +15,15 @@ from PySide6.QtWidgets import (
     QStatusBar,
     QFrame,
     QHBoxLayout,
+    QGroupBox,
+    QPushButton,
+    QTimeEdit,
 )
 import os
 
 from simpletimerbank.core.app_state import AppStateManager
 from simpletimerbank.core.countdown_timer import TimerState
 from simpletimerbank.gui.widgets.time_display import TimeDisplayWidget
-from simpletimerbank.gui.widgets.time_edit import TimeEditWidget
 from simpletimerbank.gui.widgets.timer_control import TimerControlWidget
 
 
@@ -47,7 +49,7 @@ class MainWindow(QMainWindow):
         
         # Window configuration
         self.setWindowTitle("Time Bank - Manage Your Time Assets")
-        self.setFixedSize(500, 650)  # Increased height for additional explanations
+        self.setFixedSize(500, 700)
         
         # Load custom font
         font_family = self._load_custom_font()
@@ -85,7 +87,7 @@ class MainWindow(QMainWindow):
         # --- Timer Countdown Section ---
         withdrawal_section = QVBoxLayout()
         
-        timer_header = QLabel("Active Time Withdrawal", self)
+        timer_header = QLabel("Active Timer", self)
         timer_header.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
         withdrawal_section.addWidget(timer_header)
         
@@ -111,17 +113,50 @@ class MainWindow(QMainWindow):
         
         main_layout.addLayout(withdrawal_section)
 
-        # --- Timer Controls and Duration Settings ---
+        # --- Transaction Controls ---
+        transaction_group = QGroupBox("Manage Bank Balance")
+        transaction_group_layout = QVBoxLayout()
+
+        # Amount entry
+        amount_layout = QHBoxLayout()
+        amount_label = QLabel("Amount:")
+        self._amount_edit = QTimeEdit(self)
+        self._amount_edit.setDisplayFormat("HH:mm:ss")
+        self._amount_edit.setTime(QTime(0, 15, 0))
+        amount_layout.addWidget(amount_label)
+        amount_layout.addWidget(self._amount_edit)
+        transaction_group_layout.addLayout(amount_layout)
+
+        # Convenience buttons
+        convenience_layout = QHBoxLayout()
+        presets = {"15m": 15 * 60, "30m": 30 * 60, "1h": 60 * 60, "2h": 120 * 60}
+        for text, seconds in presets.items():
+            btn = QPushButton(text, self)
+            btn.clicked.connect(lambda checked=False, secs=seconds: self._set_amount(secs))
+            convenience_layout.addWidget(btn)
+        transaction_group_layout.addLayout(convenience_layout)
+
+        # Direct operations
+        direct_ops_layout = QHBoxLayout()
+        self._deposit_button = QPushButton("Deposit", self)
+        self._withdraw_button = QPushButton("Instant Withdraw", self)
+        self._set_balance_button = QPushButton("Set Balance", self)
+        direct_ops_layout.addWidget(self._deposit_button)
+        direct_ops_layout.addWidget(self._withdraw_button)
+        direct_ops_layout.addWidget(self._set_balance_button)
+        transaction_group_layout.addLayout(direct_ops_layout)
+        
+        transaction_group.setLayout(transaction_group_layout)
+        main_layout.addWidget(transaction_group)
+        
+        # --- Timed Withdrawal Controls ---
         self._timer_control = TimerControlWidget(self)
         main_layout.addWidget(self._timer_control)
-        
-        self._time_edit = TimeEditWidget(self)
-        main_layout.addWidget(self._time_edit)
         
         # Add status bar
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
-        self.statusBar.showMessage("Ready. Set an amount and start a withdrawal.")
+        self.statusBar.showMessage("Ready. Set an amount and use the controls.")
         
         # State tracking
         self._is_overdrafting = False
@@ -161,11 +196,10 @@ class MainWindow(QMainWindow):
     
     def _connect_signals(self) -> None:
         """Connect widget signals to appropriate handler methods."""
-        # Note: We no longer connect the TimeEditWidget signals to the bank.
-        # It's now used to get duration when starting a timer.
-        self._time_edit.add_time_requested.connect(self._handle_add_time_to_bank)
-        self._time_edit.set_time_requested.connect(self._handle_set_bank_time)
-        self._time_edit.subtract_time_requested.connect(self._handle_subtract_time_from_bank)
+        # Bank operations
+        self._deposit_button.clicked.connect(self._handle_deposit)
+        self._withdraw_button.clicked.connect(self._handle_direct_withdraw)
+        self._set_balance_button.clicked.connect(self._handle_set_balance)
 
         # Timer control signals
         self._timer_control.start_requested.connect(self._handle_start_timer)
@@ -193,7 +227,7 @@ class MainWindow(QMainWindow):
             self._is_overdrafting = self._app_manager.is_overdrafting()
             self._overdraft_indicator.setVisible(self._is_overdrafting)
             if self._is_overdrafting:
-                self._overdraft_indicator.setText("OVERDRAFT ACTIVE - WITHDRAWING FROM YOUR BANK")
+                self._overdraft_indicator.setText("OVERDRAFT ACTIVE - TIME IS BEING WITHDRAWN FROM YOUR BANK")
             else:
                 self._overdraft_indicator.setText("")
         else:
@@ -208,7 +242,7 @@ class MainWindow(QMainWindow):
     def _update_status_message(self, state: TimerState) -> None:
         """Update the status bar message based on timer state."""
         if state == TimerState.IDLE:
-            self.statusBar.showMessage("Ready. Set an amount and start a withdrawal.")
+            self.statusBar.showMessage("Ready. Set an amount and start a timer or transaction.")
             self._timer_countdown_label.setStyleSheet("""
                 color: #4CAF50;
                 background-color: #1E1E1E;
@@ -218,7 +252,7 @@ class MainWindow(QMainWindow):
             """)
         elif state == TimerState.RUNNING:
             if self._is_overdrafting:
-                self.statusBar.showMessage("Overdraft Mode: Withdrawing from your bank balance")
+                self.statusBar.showMessage("Overdraft Mode: Time is being withdrawn from your bank balance.")
                 self._timer_countdown_label.setStyleSheet("""
                     color: #FFFFFF;
                     background-color: #8B0000;
@@ -227,7 +261,7 @@ class MainWindow(QMainWindow):
                     padding: 10px;
                 """)
             else:
-                self.statusBar.showMessage("Withdrawal in progress")
+                self.statusBar.showMessage("Timer running...")
                 self._timer_countdown_label.setStyleSheet("""
                     color: #4CAF50;
                     background-color: #1E1E1E;
@@ -236,7 +270,7 @@ class MainWindow(QMainWindow):
                     padding: 10px;
                 """)
         elif state == TimerState.PAUSED:
-            self.statusBar.showMessage("Withdrawal paused")
+            self.statusBar.showMessage("Timer paused.")
             self._timer_countdown_label.setStyleSheet("""
                 color: #FFA500;
                 background-color: #1E1E1E;
@@ -245,7 +279,7 @@ class MainWindow(QMainWindow):
                 padding: 10px;
             """)
         elif state == TimerState.STOPPED:
-            self.statusBar.showMessage("Withdrawal stopped. Remaining time returned to your balance.")
+            self.statusBar.showMessage("Timer stopped. Unused time has been returned to your bank.")
             self._is_overdrafting = False
             self._timer_countdown_label.setStyleSheet("""
                 color: #4CAF50;
@@ -255,20 +289,38 @@ class MainWindow(QMainWindow):
                 padding: 10px;
             """)
 
-    def _handle_add_time_to_bank(self, seconds: int):
+    def _get_amount_seconds(self) -> int:
+        time = self._amount_edit.time()
+        return time.hour() * 3600 + time.minute() * 60 + time.second()
+
+    def _set_amount(self, seconds: int) -> None:
+        h, rem = divmod(seconds, 3600)
+        m, s = divmod(rem, 60)
+        self._amount_edit.setTime(QTime(h, m, s))
+
+    def _handle_deposit(self) -> None:
+        seconds = self._get_amount_seconds()
+        if seconds <= 0:
+            QMessageBox.warning(self, "Invalid Amount", "Please set a deposit amount greater than zero.")
+            return
         self._app_manager.add_time(seconds)
         self.statusBar.showMessage(f"Deposited {self._format_time(seconds)} to your bank balance.", 3000)
         self._update_ui_from_manager()
 
-    def _handle_subtract_time_from_bank(self, seconds: int):
+    def _handle_direct_withdraw(self) -> None:
+        seconds = self._get_amount_seconds()
+        if seconds <= 0:
+            QMessageBox.warning(self, "Invalid Amount", "Please set a withdrawal amount greater than zero.")
+            return
         try:
             self._app_manager.get_time_bank().withdraw(seconds)
-            self.statusBar.showMessage(f"Withdrew {self._format_time(seconds)} from your bank balance.", 3000)
+            self.statusBar.showMessage(f"Instantly withdrew {self._format_time(seconds)} from your bank balance.", 3000)
         except ValueError as e:
             QMessageBox.warning(self, "Insufficient Balance", str(e))
         self._update_ui_from_manager()
     
-    def _handle_set_bank_time(self, seconds: int):
+    def _handle_set_balance(self) -> None:
+        seconds = self._get_amount_seconds()
         try:
             self._app_manager.set_balance(seconds)
             self.statusBar.showMessage(f"Set bank balance to {self._format_time(seconds)}", 3000)
@@ -282,18 +334,18 @@ class MainWindow(QMainWindow):
 
         if timer_state == TimerState.PAUSED:
             self._app_manager.resume_timer()
-            self.statusBar.showMessage("Withdrawal resumed", 3000)
+            self.statusBar.showMessage("Timer resumed.", 3000)
         else:
-            duration = self._time_edit.get_duration_seconds()
+            duration = self._get_amount_seconds()
             if duration <= 0:
-                QMessageBox.warning(self, "Invalid Duration", "Please set a withdrawal amount greater than zero.")
+                QMessageBox.warning(self, "Invalid Duration", "Please set a timer duration greater than zero.")
                 return
             
             if not self._app_manager.start_timer(duration):
-                QMessageBox.warning(self, "Insufficient Balance", "Not enough time in your bank for this withdrawal.")
+                QMessageBox.warning(self, "Insufficient Balance", "Not enough time in your bank for this timer.")
                 return
             
-            self.statusBar.showMessage(f"Started withdrawal of {self._format_time(duration)}", 3000)
+            self.statusBar.showMessage(f"Timer started for {self._format_time(duration)}.", 3000)
         
         self._timer.start()
         self._update_ui_from_manager()
@@ -301,14 +353,14 @@ class MainWindow(QMainWindow):
     def _handle_pause_timer(self) -> None:
         """Handle request to pause the timer."""
         self._app_manager.pause_timer()
-        self.statusBar.showMessage("Withdrawal paused", 3000)
+        self.statusBar.showMessage("Timer paused.", 3000)
         self._update_ui_from_manager()
     
     def _handle_stop_timer(self) -> None:
         """Handle request to stop the timer."""
         self._app_manager.stop_timer()
         self._is_overdrafting = False
-        self.statusBar.showMessage("Withdrawal cancelled. Remaining time returned to your balance.", 3000)
+        self.statusBar.showMessage("Timer stopped. Unused time refunded to your balance.", 3000)
         self._timer.stop()
         self._update_ui_from_manager()
     
@@ -326,10 +378,8 @@ class MainWindow(QMainWindow):
         
     def _on_timer_completion(self) -> None:
         """Handle timer completion event."""
-        self.statusBar.showMessage("Withdrawal complete - Now in overdraft mode!", 5000)
-        QMessageBox.warning(self, "Overdraft Mode Activated", 
-                           "Your planned withdrawal time has been used up! You are now in overdraft mode.\n\n"
-                           "The additional time will be withdrawn directly from your bank balance.")
+        self.statusBar.showMessage("Timer complete - Now in overdraft mode!", 5000)
+        self._app_manager.get_notification_service().notify_overdraft_started()
         
     def _format_time(self, total_seconds: int) -> str:
         """Format seconds as HH:MM:SS string.

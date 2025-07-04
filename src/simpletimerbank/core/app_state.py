@@ -297,6 +297,16 @@ class AppStateManager:
         """
         return self._app_state.get_time_bank()
     
+    def get_notification_service(self) -> NotificationService:
+        """Get the notification service instance.
+        
+        Returns
+        -------
+        NotificationService
+            The notification service instance.
+        """
+        return self._app_state.get_notification_service()
+    
     def set_balance(self, seconds: int) -> None:
         """Set the time balance directly.
         

@@ -44,13 +44,13 @@ class TimerControlWidget(QWidget):
         main_layout.addWidget(explanation)
         
         # Group box for controls
-        group_box = QGroupBox("Withdrawal Controls", self)
+        group_box = QGroupBox("Timer Controls", self)
         button_layout = QHBoxLayout(group_box)
         
         # Create buttons
-        self._start_button = QPushButton("Start Withdrawal", self)
-        self._pause_button = QPushButton("Pause", self)
-        self._stop_button = QPushButton("Cancel & Return Time", self)
+        self._start_button = QPushButton("Start Timer", self)
+        self._pause_button = QPushButton("Pause Timer", self)
+        self._stop_button = QPushButton("Stop Timer & Refund", self)
         
         button_layout.addWidget(self._start_button)
         button_layout.addWidget(self._pause_button)
@@ -77,7 +77,7 @@ class TimerControlWidget(QWidget):
         """
         if state == TimerState.IDLE:
             self._start_button.setEnabled(True)
-            self._start_button.setText("Start Withdrawal")
+            self._start_button.setText("Start Timer")
             self._pause_button.setEnabled(False)
             self._stop_button.setEnabled(False)
         elif state == TimerState.RUNNING:
@@ -86,11 +86,11 @@ class TimerControlWidget(QWidget):
             self._stop_button.setEnabled(True)
         elif state == TimerState.PAUSED:
             self._start_button.setEnabled(True)
-            self._start_button.setText("Resume Withdrawal")
+            self._start_button.setText("Resume Timer")
             self._pause_button.setEnabled(False)
             self._stop_button.setEnabled(True)
         elif state == TimerState.STOPPED:
             self._start_button.setEnabled(True)
-            self._start_button.setText("Start Withdrawal")
+            self._start_button.setText("Start Timer")
             self._pause_button.setEnabled(False)
             self._stop_button.setEnabled(False) 

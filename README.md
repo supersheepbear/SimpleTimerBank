@@ -24,15 +24,27 @@ Simple Timer Bank is a desktop application for managing your personal "free time
 
 ## Installation
 
-The recommended way to install Simple Timer Bank is via `pip` or `uv`:
+There are two ways to install Simple Timer Bank:
+
+### Option 1: For Python Users (Recommended)
+
+The recommended way to install is via `pip` or `uv`, which works on Windows, macOS, and Linux:
 
 ```bash
 # Using pip
 pip install simpletimerbank
-
 # Or using uv
-uv add simpletimerbank
+uv pip install simpletimerbank
 ```
+This will automatically handle dependencies and make the `simpletimerbank` command available in your terminal.
+
+### Option 2: For Windows Users (Standalone EXE)
+
+If you are on Windows and prefer not to use Python or `pip`, you can download a standalone executable:
+
+1.  Go to the [**GitHub Releases**](https://github.com/supersheepbear/SimpleTimerBank/releases) page.
+2.  Download the `.zip` file from the latest release.
+3.  Unzip the file and run `SimpleTimerBank.exe`.
 
 ## Usage
 

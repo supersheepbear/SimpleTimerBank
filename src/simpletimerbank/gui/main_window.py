@@ -249,7 +249,12 @@ class MainWindow(QMainWindow):
         self._app_manager.set_qt_timer(self._timer)
     
     def _connect_signals(self) -> None:
-        """Connect widget signals to appropriate handler methods."""
+        """Connect widget signals to the appropriate handler methods.
+        
+        This method is central to the application's interactivity, wiring up
+        user actions (like button clicks) to the functions that execute the
+        corresponding logic, such as depositing time or starting a timer.
+        """
         # Bank operations
         self._deposit_button.clicked.connect(self._handle_deposit)
         self._withdraw_button.clicked.connect(self._handle_direct_withdraw)
@@ -265,7 +270,13 @@ class MainWindow(QMainWindow):
         self._app_manager.set_timer_completion_callback(self._on_timer_completion)
     
     def _update_ui_from_manager(self) -> None:
-        """Update the entire UI based on the current AppManager state."""
+        """Update the entire UI based on the current state from the AppManager.
+        
+        This method is called whenever a state change occurs (e.g., after a
+        transaction or during a timer tick) to ensure the GUI is a consistent
+        reflection of the application's data. It updates the balance display,
+        the timer countdown, button states, and status messages.
+        """
         # Update bank balance display
         balance_formatted = self._app_manager.get_balance_formatted()
         self._time_display.update_time(balance_formatted)
@@ -294,7 +305,17 @@ class MainWindow(QMainWindow):
         self._update_status_message(timer_state)
 
     def _update_status_message(self, state: TimerState) -> None:
-        """Update the status bar message based on timer state."""
+        """Update the status bar message based on the current timer state.
+        
+        This provides contextual feedback to the user at the bottom of the
+        window, guiding them on what to do next or confirming an action.
+        
+        Parameters
+        ----------
+        state : TimerState
+            The current state of the countdown timer, used to determine the
+            appropriate message to display.
+        """
         if state == TimerState.IDLE:
             self.statusBar.showMessage("Ready. Set an amount and start a timer or transaction.")
             self._timer_countdown_label.setStyleSheet("""
@@ -344,11 +365,29 @@ class MainWindow(QMainWindow):
             """)
 
     def _get_amount_seconds(self) -> int:
+        """Get the current time value from the amount input field.
+        
+        Returns
+        -------
+        int
+            The number of seconds specified in the 'Amount' QTimeEdit widget.
+        """
         time = self._amount_edit.time()
         return time.hour() * 3600 + time.minute() * 60 + time.second()
 
     def _adjust_amount(self, seconds_delta: int) -> None:
-        """Adjust the amount in the QTimeEdit by a relative number of seconds."""
+        """Adjust the amount in the QTimeEdit by a relative number of seconds.
+        
+        This method is connected to the preset +/- buttons (e.g., '+15m')
+        and handles the logic of adding or subtracting time from the amount
+        field, ensuring the value stays within a valid 24-hour range.
+
+        Parameters
+        ----------
+        seconds_delta : int
+            The number of seconds to add or subtract. Can be positive or
+            negative.
+        """
         current_time = self._amount_edit.time()
         current_seconds = (current_time.hour() * 3600 +
                            current_time.minute() * 60 +
@@ -370,6 +409,10 @@ class MainWindow(QMainWindow):
         self._amount_edit.setTime(QTime(h, m, s))
 
     def _handle_deposit(self) -> None:
+        """Handle a deposit action from the user.
+        
+        Reads the amount from the input field and adds it to the time bank.
+        """
         seconds = self._get_amount_seconds()
         if seconds <= 0:
             QMessageBox.warning(self, "Invalid Amount", "Please set a deposit amount greater than zero.")
@@ -379,6 +422,11 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
 
     def _handle_direct_withdraw(self) -> None:
+        """Handle an instant withdrawal from the time bank.
+        
+        Reads the amount from the input field and immediately subtracts it
+        from the bank balance, if sufficient funds are available.
+        """
         seconds = self._get_amount_seconds()
         if seconds <= 0:
             QMessageBox.warning(self, "Invalid Amount", "Please set a withdrawal amount greater than zero.")
@@ -391,6 +439,11 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
     
     def _handle_set_balance(self) -> None:
+        """Handle a request to set the bank balance to a specific value.
+        
+        Reads the amount from the input field and sets the bank balance
+        directly to that value.
+        """
         seconds = self._get_amount_seconds()
         try:
             self._app_manager.set_balance(seconds)
@@ -400,7 +453,11 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
         
     def _handle_start_timer(self) -> None:
-        """Handle request to start or resume the timer."""
+        """Handle the user's request to start or resume the countdown timer.
+        
+        If the timer is paused, it resumes. Otherwise, it starts a new
+        timer session with the duration specified in the amount field.
+        """
         timer_state = self._app_manager.get_timer_state()
 
         if timer_state == TimerState.PAUSED:
@@ -422,13 +479,17 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
     
     def _handle_pause_timer(self) -> None:
-        """Handle request to pause the timer."""
+        """Handle the user's request to pause the running timer."""
         self._app_manager.pause_timer()
         self.statusBar.showMessage("Timer paused.", 3000)
         self._update_ui_from_manager()
     
     def _handle_stop_timer(self) -> None:
-        """Handle request to stop the timer."""
+        """Handle the user's request to stop the timer.
+        
+        This action stops the timer and refunds any unused time back to the
+        bank balance.
+        """
         self._app_manager.stop_timer()
         self._is_overdrafting = False
         self.statusBar.showMessage("Timer stopped. Unused time refunded to your balance.", 3000)
@@ -436,19 +497,37 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
     
     def _handle_timer_tick(self) -> None:
-        """Handle timer tick from QTimer."""
+        """Process a single tick of the main application timer (QTimer).
+        
+        This method is connected to the QTimer's timeout signal and is
+        called every second. It drives the countdown logic in the core
+        application state and triggers a UI update.
+        """
         if self._app_manager.get_timer_state() == TimerState.RUNNING:
             # Direct access to app_state.tick_timer() is not ideal but works for now
             self._app_manager._app_state.tick_timer()
             self._update_ui_from_manager()
     
     def _on_timer_tick(self, remaining_seconds: int) -> None:
-        """Update the UI on each timer tick."""
+        """Callback executed by the core logic on each second of the countdown.
+        
+        This method is registered with the AppStateManager and is called
+        by the core application logic to signal that the UI should be updated.
+
+        Parameters
+        ----------
+        remaining_seconds : int
+            The number of seconds left on the timer.
+        """
         # This callback now drives the UI update
         self._update_ui_from_manager()
         
     def _on_timer_completion(self) -> None:
-        """Handle timer completion event."""
+        """Handle the timer completion event from the core logic.
+        
+        This is called when the timer's initial duration runs out and
+        overdraft mode begins. It triggers a system notification.
+        """
         self.statusBar.showMessage("Timer complete - Now in overdraft mode!", 5000)
         self._app_manager.get_notification_service().notify_overdraft_started()
         

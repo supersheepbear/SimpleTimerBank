@@ -1,7 +1,7 @@
 """Time display widget for SimpleTimerBank.
 
 This module provides a widget to display the time balance in a visually
-appealing format, like a digital clock.
+appealing, read-only digital clock format.
 """
 
 from PySide6.QtCore import Qt
@@ -10,10 +10,11 @@ from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout
 
 
 class TimeDisplayWidget(QWidget):
-    """A widget to display the time balance using a large QLabel.
+    """A widget to display a time value using a large, digital-style label.
     
-    This widget provides a visually clear, non-editable display of the
-    current time balance, formatted as HH:MM:SS.
+    This widget is used for displaying the main bank balance and is designed
+    to be a clear, non-editable read-out of a time value formatted as HH:MM:SS.
+    It supports a normal and an "overdraft" style to provide visual feedback.
     """
     
     def __init__(self, parent: QWidget = None, font_family: str = "Courier New") -> None:
@@ -22,9 +23,10 @@ class TimeDisplayWidget(QWidget):
         Parameters
         ----------
         parent : QWidget, optional
-            The parent widget, by default None.
+            The parent widget of this component. Defaults to None.
         font_family : str
-            The font family to use for the display.
+            The name of the font family to use for the digital display.
+            Defaults to "Courier New".
         """
         super().__init__(parent)
         
@@ -71,20 +73,20 @@ class TimeDisplayWidget(QWidget):
         Parameters
         ----------
         formatted_time : str
-            The time string to display, e.g., "HH:MM:SS".
+            The time string to display, formatted as HH:MM:SS.
         """
         self._time_label.setText(formatted_time)
     
     def set_overdraft_mode(self, is_overdraft: bool) -> None:
-        """Set whether the display is in overdraft mode.
+        """Set the visual style of the display to indicate overdraft status.
         
-        In overdraft mode, the display uses a different color scheme to
-        visually indicate that the user is now withdrawing from their balance.
+        In overdraft mode, the display uses a different color scheme (e.g., red)
+        to visually indicate that the associated value is in a special state.
         
         Parameters
         ----------
         is_overdraft : bool
-            Whether the display should be in overdraft mode.
+            True to switch to overdraft style, False for normal style.
         """
         if is_overdraft == self._is_overdraft_mode:
             return  # No change needed

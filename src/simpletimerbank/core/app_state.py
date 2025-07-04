@@ -1,7 +1,8 @@
 """Application state management module.
 
-This module contains the AppState class responsible for coordinating
-state across all application components and managing the application lifecycle.
+This module defines the classes responsible for managing the application's
+core logic and state. It acts as an intermediary between the user interface
+and the underlying data models (TimeBank, CountdownTimer, etc.).
 """
 
 from typing import Callable, Optional, Dict, Any
@@ -13,14 +14,17 @@ from .notification_service import NotificationService
 
 
 class AppState:
-    """Manages application state for the SimpleTimerBank application.
+    """Manages the core application state and business logic.
     
-    This class orchestrates the interaction between TimeBank and CountdownTimer,
-    handling session management, timer callbacks, and persistence.
+    This class orchestrates the interactions between the TimeBank, CountdownTimer,
+    PersistenceService, and NotificationService. It is responsible for handling
+    session management (start, stop, pause, resume), timer ticks, overdraft
+    logic, and the application's startup and shutdown sequences (including data
+    persistence). It is not directly exposed to the GUI.
     """
     
     def __init__(self) -> None:
-        """Initialize AppState with default components."""
+        """Initialize AppState with all core service components."""
         # Initialize core components
         self._time_bank = TimeBank()
         self._countdown_timer = CountdownTimer()
@@ -36,7 +40,11 @@ class AppState:
         self._initialized = False
     
     def initialize(self) -> None:
-        """Initialize application state and load saved data."""
+        """Initialize the application state.
+        
+        This method should be called once at startup. It loads the saved
+        time balance from the persistence service and restores it.
+        """
         if self._initialized:
             return
         
@@ -53,7 +61,11 @@ class AppState:
         self._initialized = True
     
     def shutdown(self) -> None:
-        """Shutdown application and save current state."""
+        """Shut down the application and persist the current state.
+        
+        This method should be called once when the application is closing.
+        It ensures the current time balance is saved to disk.
+        """
         # Stop any running timer
         try:
             if self._countdown_timer.get_state() != TimerState.IDLE and \
@@ -76,12 +88,12 @@ class AppState:
             pass
     
     def get_time_bank(self) -> TimeBank:
-        """Get reference to the time bank.
+        """Get the application's TimeBank instance.
         
         Returns
         -------
         TimeBank
-            Reference to TimeBank instance.
+            The singleton TimeBank instance containing the user's balance.
         """
         return self._time_bank
     
@@ -308,27 +320,22 @@ class AppStateManager:
         return self._app_state.get_notification_service()
     
     def set_balance(self, seconds: int) -> None:
-        """Set the time balance directly.
+        """Set the time bank balance to a specific value.
         
         Parameters
         ----------
         seconds : int
-            New balance value in seconds.
-        
-        Raises
-        ------
-        ValueError
-            If seconds is negative.
+            The new balance value in seconds.
         """
         self._app_state.get_time_bank().set_balance(seconds)
     
     def add_time(self, seconds: int) -> None:
-        """Add time to the balance.
+        """Deposit a specific amount of time into the time bank.
         
         Parameters
         ----------
         seconds : int
-            Amount of time to add in seconds.
+            The amount of time to add in seconds.
         """
         self._app_state.get_time_bank().deposit(seconds)
     
@@ -359,8 +366,11 @@ class AppStateManager:
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
     
     def start_timer(self, duration: int) -> bool:
-        """Start the timer with a specific duration.
+        """Start a new timer session.
         
+        This attempts to withdraw the specified duration from the time bank
+        and, if successful, starts the countdown.
+
         Parameters
         ----------
         duration : int
@@ -369,49 +379,56 @@ class AppStateManager:
         Returns
         -------
         bool
-            True if timer started successfully, False otherwise.
+            True if the timer was successfully started, False otherwise (e.g.,
+            due to insufficient balance).
         """
         return self._app_state.start_session(duration)
     
     def pause_timer(self) -> None:
-        """Pause the timer."""
+        """Pause the currently running timer session."""
         self._app_state.pause_session()
     
     def resume_timer(self) -> None:
-        """Resume a paused timer."""
+        """Resume a paused timer session."""
         self._app_state.resume_session()
     
     def stop_timer(self) -> None:
-        """Stop the timer and refund any remaining time."""
+        """Stop the current timer session and refund unused time."""
         self._app_state.stop_session()
     
     def get_timer_state(self) -> TimerState:
-        """Get the current timer state.
+        """Get the current state of the countdown timer.
         
         Returns
         -------
         TimerState
-            Current state of the timer.
+            The current state (e.g., IDLE, RUNNING, PAUSED).
         """
         return self._app_state.get_countdown_timer().get_state()
     
     def set_timer_callback(self, callback: Callable[[int], None]) -> None:
-        """Set callback function for timer ticks.
+        """Register a callback function to be executed on each timer tick.
+        
+        The provided callback will be invoked by the core logic each second
+        the timer runs, allowing the GUI to update accordingly.
         
         Parameters
         ----------
         callback : Callable[[int], None]
-            Function to call with remaining seconds on each tick.
+            A function that accepts one integer argument (remaining_seconds).
         """
         self._app_state.set_timer_tick_callback(callback)
     
     def set_timer_completion_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback function for timer completion.
+        """Register a callback function for when the timer completes.
+        
+        The provided callback is invoked at the moment the timer's initial
+        duration reaches zero and it transitions into overdraft mode.
         
         Parameters
         ----------
         callback : Callable[[], None]
-            Function to call when timer completes initial countdown.
+            A function that will be called upon timer completion.
         """
         self._app_state.set_timer_completion_callback(callback)
     
@@ -426,11 +443,12 @@ class AppStateManager:
         self._qt_timer = timer
         
     def is_overdrafting(self) -> bool:
-        """Check if the timer is in overdraft mode.
+        """Check if the timer is currently in overdraft mode.
         
         Returns
         -------
         bool
-            True if the timer is overdrafting, False otherwise.
+            True if the timer has exhausted its initial duration and is now
+            withdrawing time from the bank, False otherwise.
         """
         return self._app_state.get_countdown_timer().is_overdrafting() 

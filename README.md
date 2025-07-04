@@ -1,17 +1,15 @@
 # Simple Timer Bank 🏦
 
-Ever feel like you've *earned* some time to play video games 🎮, watch movies 🍿, or just relax, but have trouble tracking it?
-
-**Simple Timer Bank** is your personal time bank for guilt-free leisure. Earn time by being productive, deposit it into your "bank," and then spend it whenever you want on the fun stuff.
+Simple Timer Bank is a desktop application for managing your personal "free time." It helps you balance productive work with leisure activities like gaming 🎮, watching movies 🍿, or any other hobbies by treating your free time as a resource in a "bank."
 
 ![SimpleTimerBank Screenshot](docs/assets/screenshot.png)
 
-## How It Works 🤔
+## How It Works
 
--   **Earn & Bank Your Time**: Finished a task? Studied for an hour? Deposit that time into your bank. You've earned it!
--   **Start the Fun Timer**: Ready to play? Start a timer session to "withdraw" and spend your banked time.
--   **Go Into Overdraft**: Can't stop mid-game? No problem. The timer will go into "overdraft," borrowing from your main bank balance so you can finish your round. You'll get a notification, but the fun doesn't have to stop immediately.
--   **Stop Early, Get a Refund**: End your session early? The unused time is automatically refunded to your bank.
+-   **Bank Your Time 💰**: Deposit time you've set aside for leisure into your personal time bank.
+-   **Spend Your Time ⏳**: When you're ready for a break, start a timer to begin "withdrawing" and consuming your banked time.
+-   **Overdraft Feature ⚠️**: If your timer runs out but you're not ready to stop, the app automatically enters "overdraft mode." It will start drawing from your main bank balance, preventing abrupt interruptions while keeping track of the extra time used.
+-   **Automatic Refunds 🔄**: If you end a session early, any unused time from the timer is automatically returned to your bank.
 
 ## Features
 

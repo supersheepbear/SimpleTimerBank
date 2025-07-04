@@ -38,6 +38,21 @@ publish: ## Publish a release to PyPI.
 .PHONY: build-and-publish
 build-and-publish: build publish ## Build and publish.
 
+.PHONY: build-exe
+build-exe: ## Build standalone executable using PyInstaller
+	@echo "🚀 Building standalone executable"
+	@uv run python build.py
+
+.PHONY: clean-exe
+clean-exe: ## Clean executable build artifacts
+	@echo "🚀 Cleaning executable build artifacts"
+	@uv run python -c "import shutil; import os; [shutil.rmtree(d) if os.path.exists(d) else None for d in ['build', 'dist']]"
+
+.PHONY: test-exe
+test-exe: build-exe ## Build and test the executable
+	@echo "🚀 Testing executable"
+	@if [ -f "dist/SimpleTimerBank.exe" ]; then echo "✅ Executable built successfully: dist/SimpleTimerBank.exe"; else echo "❌ Executable not found"; exit 1; fi
+
 .PHONY: docs-test
 docs-test: ## Test if documentation can be built without warnings or errors
 	@uv run mkdocs build -s

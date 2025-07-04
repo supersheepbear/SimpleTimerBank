@@ -1,11 +1,8 @@
 """Time balance management module.
 
-This module will contain the TimeBalance class responsible for managing
+This module contains the TimeBalance class responsible for managing
 the user's time balance (add time, subtract time, format display).
-Full implementation will be done in Phase 2 - Task 2.1.
 """
-
-from typing import Any
 
 
 class TimeBalance:
@@ -13,16 +10,11 @@ class TimeBalance:
     
     This class handles adding and subtracting time from the user's balance,
     formatting time for display, and validating time operations.
-    
-    Note
-    ----
-    This is a placeholder stub. Full implementation in Phase 2 - Task 2.1.
     """
     
     def __init__(self) -> None:
         """Initialize TimeBalance with zero balance."""
-        # TODO: Implement in Phase 2 - Task 2.1
-        pass
+        self._balance_seconds: int = 0
     
     def add_time(self, seconds: int) -> None:
         """Add time to the balance.
@@ -31,9 +23,15 @@ class TimeBalance:
         ----------
         seconds : int
             Number of seconds to add to the balance.
+            
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
         """
-        # TODO: Implement in Phase 2 - Task 2.1
-        pass
+        if seconds < 0:
+            raise ValueError("Cannot add negative time")
+        self._balance_seconds += seconds
     
     def subtract_time(self, seconds: int) -> bool:
         """Subtract time from the balance.
@@ -47,8 +45,18 @@ class TimeBalance:
         -------
         bool
             True if subtraction was successful, False if insufficient balance.
+            
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
         """
-        # TODO: Implement in Phase 2 - Task 2.1
+        if seconds < 0:
+            raise ValueError("Cannot subtract negative time")
+            
+        if self._balance_seconds >= seconds:
+            self._balance_seconds -= seconds
+            return True
         return False
     
     def get_balance_seconds(self) -> int:
@@ -59,8 +67,7 @@ class TimeBalance:
         int
             Current time balance in seconds.
         """
-        # TODO: Implement in Phase 2 - Task 2.1
-        return 0
+        return self._balance_seconds
     
     def format_time(self, seconds: int) -> str:
         """Format seconds into HH:MM:SS string.
@@ -74,6 +81,27 @@ class TimeBalance:
         -------
         str
             Formatted time string in HH:MM:SS format.
+            
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
         """
-        # TODO: Implement in Phase 2 - Task 2.1
-        return "00:00:00" 
+        if seconds < 0:
+            raise ValueError("Cannot format negative time")
+            
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        remaining_seconds = seconds % 60
+        
+        return f"{hours:02d}:{minutes:02d}:{remaining_seconds:02d}"
+    
+    def get_balance_formatted(self) -> str:
+        """Get current balance as formatted string.
+        
+        Returns
+        -------
+        str
+            Current balance formatted as HH:MM:SS.
+        """
+        return self.format_time(self._balance_seconds) 

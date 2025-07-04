@@ -2,6 +2,8 @@
 
 Simple Timer Bank is a desktop application for managing your personal "free time." It helps you balance productive work with leisure activities like gaming 🎮, watching movies 🍿, or any other hobbies by treating your free time as a resource in a "bank."
 
+For full feature details and usage guides, please see the [**Official Documentation**](https://supersheepbear.github.io/SimpleTimerBank/).
+
 ![SimpleTimerBank Screenshot](docs/assets/screenshot.png)
 
 ## How It Works

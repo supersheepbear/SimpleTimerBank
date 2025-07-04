@@ -116,6 +116,21 @@ class AppStateManager:
         """
         self._time_balance.add_time(seconds)
     
+    def set_balance(self, seconds: int) -> None:
+        """Set the time balance to an absolute value.
+        
+        Parameters
+        ----------
+        seconds : int
+            The total number of seconds to set the balance to.
+            
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
+        """
+        self._time_balance.set_balance(seconds)
+    
     def get_balance_seconds(self) -> int:
         """Get current balance in seconds.
         

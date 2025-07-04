@@ -114,6 +114,26 @@ class TestTimeBalance:
         tb.add_time(3725)  # 1 hour, 2 minutes, 5 seconds
         assert tb.get_balance_formatted() == "01:02:05"
     
+    def test_set_balance_updates_correctly(self) -> None:
+        """Test setting the balance directly."""
+        tb = TimeBalance()
+        tb.add_time(1000)  # Initial value
+        tb.set_balance(300)
+        assert tb.get_balance_seconds() == 300
+
+    def test_set_balance_with_zero(self) -> None:
+        """Test setting the balance to zero."""
+        tb = TimeBalance()
+        tb.add_time(500)
+        tb.set_balance(0)
+        assert tb.get_balance_seconds() == 0
+
+    def test_set_balance_with_negative_raises_error(self) -> None:
+        """Test setting the balance to a negative value raises ValueError."""
+        tb = TimeBalance()
+        with pytest.raises(ValueError, match="Balance cannot be negative"):
+            tb.set_balance(-100)
+    
     def test_multiple_operations_sequence(self) -> None:
         """Test a sequence of multiple operations."""
         tb = TimeBalance()

@@ -69,6 +69,23 @@ class TimeBalance:
         """
         return self._balance_seconds
     
+    def set_balance(self, seconds: int) -> None:
+        """Set the balance to an absolute value.
+        
+        Parameters
+        ----------
+        seconds : int
+            The total number of seconds to set the balance to.
+            
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
+        """
+        if seconds < 0:
+            raise ValueError("Balance cannot be negative")
+        self._balance_seconds = seconds
+    
     def format_time(self, seconds: int) -> str:
         """Format seconds into HH:MM:SS string.
         

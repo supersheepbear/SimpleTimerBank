@@ -21,13 +21,14 @@ class TimeEditWidget(QWidget):
     """A widget for editing the time balance.
     
     This widget provides spin boxes for hours, minutes, and seconds,
-    along with "Add Time" and "Subtract Time" buttons. It emits signals
+    along with "Add Time", "Subtract Time", and "Set Time" buttons. It emits signals
     when these buttons are clicked.
     """
     
     # Signals
     add_time_requested = Signal(int)  # Emits total seconds to add
     subtract_time_requested = Signal(int)  # Emits total seconds to subtract
+    set_time_requested = Signal(int) # Emits total seconds to set
     
     def __init__(self, parent: QWidget = None) -> None:
         """Initialize the TimeEditWidget.
@@ -64,8 +65,10 @@ class TimeEditWidget(QWidget):
         button_layout = QHBoxLayout()
         self._add_button = QPushButton("Add Time", self)
         self._subtract_button = QPushButton("Subtract Time", self)
+        self._set_button = QPushButton("Set Time", self)
         button_layout.addWidget(self._add_button)
         button_layout.addWidget(self._subtract_button)
+        button_layout.addWidget(self._set_button)
         
         group_layout.addLayout(button_layout, 2, 0, 1, 3)
         
@@ -75,6 +78,7 @@ class TimeEditWidget(QWidget):
         # Connect signals
         self._add_button.clicked.connect(self._on_add_clicked)
         self._subtract_button.clicked.connect(self._on_subtract_clicked)
+        self._set_button.clicked.connect(self._on_set_clicked)
     
     def _create_spinbox(self, min_val: int, max_val: int) -> QSpinBox:
         """Helper to create and configure a QSpinBox."""
@@ -102,4 +106,11 @@ class TimeEditWidget(QWidget):
         """Handle subtract button click."""
         total_seconds = self._get_total_seconds()
         if total_seconds > 0:
-            self.subtract_time_requested.emit(total_seconds) 
+            self.subtract_time_requested.emit(total_seconds)
+
+    def _on_set_clicked(self) -> None:
+        """Handle set button click."""
+        total_seconds = self._get_total_seconds()
+        # Allow setting time to 0
+        if total_seconds >= 0:
+            self.set_time_requested.emit(total_seconds) 

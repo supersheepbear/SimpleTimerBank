@@ -294,4 +294,11 @@ class TestAppStateManager:
         manager.initialize()
         
         # Should load the balance correctly
-        assert manager.get_balance_seconds() == 1800 
+        assert manager.get_balance_seconds() == 1800
+
+    def test_set_balance_updates_time_balance(self) -> None:
+        """Test the set_balance method correctly updates the balance."""
+        manager = AppStateManager()
+        manager.add_time(1000)  # Set initial balance
+        manager.set_balance(150)
+        assert manager.get_balance_seconds() == 150 

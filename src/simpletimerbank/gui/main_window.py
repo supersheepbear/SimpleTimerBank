@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
         # Time editing signals
         self._time_edit.add_time_requested.connect(self._handle_add_time)
         self._time_edit.subtract_time_requested.connect(self._handle_subtract_time)
+        self._time_edit.set_time_requested.connect(self._handle_set_time)
         
         # Timer control signals
         self._timer_control.start_requested.connect(self._handle_start_timer)
@@ -95,6 +96,14 @@ class MainWindow(QMainWindow):
     def _handle_add_time(self, seconds: int) -> None:
         """Handle request to add time."""
         self._app_manager.add_time(seconds)
+        self._update_ui_from_manager()
+    
+    def _handle_set_time(self, seconds: int) -> None:
+        """Handle request to set the time balance directly."""
+        try:
+            self._app_manager.set_balance(seconds)
+        except ValueError as e:
+            QMessageBox.warning(self, "Invalid Time", str(e))
         self._update_ui_from_manager()
     
     def _handle_subtract_time(self, seconds: int) -> None:

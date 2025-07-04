@@ -1,7 +1,7 @@
 [project]
 name = "SimpleTimerBank"
-version = "0.0.1"
-description = "timer bbank that is used for time management"
+version = "0.0.2"
+description = "A desktop application for managing your personal \"free time\" bank."
 authors = [{ name = "supersheepbear", email = "supersheepbear@gmail.com" }]
 readme = "README.md"
 keywords = ['python']

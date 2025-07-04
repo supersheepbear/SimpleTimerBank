@@ -5,7 +5,7 @@ to control the countdown timer.
 """
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QGroupBox
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QGroupBox, QVBoxLayout, QLabel
 
 from simpletimerbank.core.countdown_timer import TimerState
 
@@ -34,16 +34,23 @@ class TimerControlWidget(QWidget):
         super().__init__(parent)
         
         # Create main layout
-        main_layout = QHBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        
+        # Add explanation label
+        explanation = QLabel("Use the controls below to start a time withdrawal session. "
+                            "When you stop the timer, any unused time will be returned to your bank.", self)
+        explanation.setWordWrap(True)
+        explanation.setStyleSheet("font-size: 11px; color: #666; margin-bottom: 5px;")
+        main_layout.addWidget(explanation)
         
         # Group box for controls
-        group_box = QGroupBox("Timer Controls", self)
+        group_box = QGroupBox("Withdrawal Controls", self)
         button_layout = QHBoxLayout(group_box)
         
         # Create buttons
-        self._start_button = QPushButton("Start", self)
+        self._start_button = QPushButton("Start Withdrawal", self)
         self._pause_button = QPushButton("Pause", self)
-        self._stop_button = QPushButton("Stop", self)
+        self._stop_button = QPushButton("Cancel & Return Time", self)
         
         button_layout.addWidget(self._start_button)
         button_layout.addWidget(self._pause_button)
@@ -58,18 +65,19 @@ class TimerControlWidget(QWidget):
         self._stop_button.clicked.connect(self.stop_requested)
         
         # Set initial button state
-        self.update_button_states(TimerState.STOPPED)
+        self.update_button_states(TimerState.IDLE)
     
     def update_button_states(self, state: TimerState) -> None:
-        """Update button enabled/disabled state based on timer state.
+        """Update button enabled states based on timer state.
         
         Parameters
         ----------
         state : TimerState
-            The current state of the countdown timer.
+            The current timer state.
         """
-        if state == TimerState.STOPPED:
+        if state == TimerState.IDLE:
             self._start_button.setEnabled(True)
+            self._start_button.setText("Start Withdrawal")
             self._pause_button.setEnabled(False)
             self._stop_button.setEnabled(False)
         elif state == TimerState.RUNNING:
@@ -77,6 +85,12 @@ class TimerControlWidget(QWidget):
             self._pause_button.setEnabled(True)
             self._stop_button.setEnabled(True)
         elif state == TimerState.PAUSED:
-            self._start_button.setEnabled(True)  # Resume
+            self._start_button.setEnabled(True)
+            self._start_button.setText("Resume Withdrawal")
             self._pause_button.setEnabled(False)
-            self._stop_button.setEnabled(True) 
+            self._stop_button.setEnabled(True)
+        elif state == TimerState.STOPPED:
+            self._start_button.setEnabled(True)
+            self._start_button.setText("Start Withdrawal")
+            self._pause_button.setEnabled(False)
+            self._stop_button.setEnabled(False) 

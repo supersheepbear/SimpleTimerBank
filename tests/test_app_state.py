@@ -16,6 +16,15 @@ from simpletimerbank.core.persistence import PersistenceService
 class TestAppState:
     """Test suite for AppState class."""
     
+    def setup_method(self):
+        """Mock dependencies for all tests in this class."""
+        self.notification_patcher = patch('simpletimerbank.core.app_state.NotificationService')
+        self.mock_notification_service = self.notification_patcher.start()
+
+    def teardown_method(self):
+        """Stop all patchers."""
+        self.notification_patcher.stop()
+    
     def test_init_creates_components(self) -> None:
         """Test AppState initializes and creates all components."""
         app_state = AppState()
@@ -160,8 +169,9 @@ class TestAppState:
         assert app_state.get_time_bank().get_balance() == 297  # 300 - 2 - 1
     
     def test_tick_timer_stops_when_bank_depleted(self) -> None:
-        """Test ticking timer stops when bank balance is depleted."""
+        """Test ticking timer stops and notifies when bank balance is depleted."""
         app_state = AppState()
+        mock_notification_service = app_state.get_notification_service()
         app_state.get_time_bank().deposit(2)
         app_state.start_session(1)
         
@@ -181,20 +191,25 @@ class TestAppState:
         # Tick again - should stop timer since bank is depleted
         app_state.tick_timer()
         assert timer.get_state() == TimerState.STOPPED
+        
+        # Verify notification was sent
+        mock_notification_service.notify_bank_depleted.assert_called_once()
     
-    def test_timer_completion_triggers_notification(self) -> None:
-        """Test timer completion triggers notification callback."""
+    def test_timer_completion_triggers_callback_and_notification(self) -> None:
+        """Test timer completion triggers user callback and notification."""
         callback_mock = Mock()
         
         app_state = AppState()
+        mock_notification_service = app_state.get_notification_service()
         app_state.set_timer_completion_callback(callback_mock)
         app_state.get_time_bank().deposit(300)
         app_state.start_session(1)
         
-        # Tick to zero and enter overdraft - should trigger notification
+        # This will call AppState._on_timer_completion via callback
         app_state.get_countdown_timer().tick()
         
         callback_mock.assert_called_once()
+        mock_notification_service.notify_timer_completed.assert_called_once()
     
     def test_handle_overdraft_signal(self) -> None:
         """Test the internal _handle_overdraft_signal method."""

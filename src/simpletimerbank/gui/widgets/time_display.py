@@ -34,7 +34,7 @@ class TimeDisplayWidget(QWidget):
         
         # Create the time display label
         self._time_label = QLabel("00:00:00", self)
-        font = QFont(font_family, 60, QFont.Weight.Bold)  # Reduced font size
+        font = QFont(font_family, 48, QFont.Weight.Bold)  # Reduced font size
         self._time_label.setFont(font)
         self._time_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
@@ -58,14 +58,8 @@ class TimeDisplayWidget(QWidget):
         # Set initial style
         self._time_label.setStyleSheet(self._normal_style)
         
-        # Create a mode label to indicate overdraft
-        self._mode_label = QLabel("NORMAL MODE", self)
-        self._mode_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._mode_label.setStyleSheet("font-weight: bold; color: #4A4A4A;")
-        
         # Add widgets to layout
         layout.addWidget(self._time_label)
-        layout.addWidget(self._mode_label)
         self.setLayout(layout)
         
         # Track overdraft state
@@ -99,9 +93,5 @@ class TimeDisplayWidget(QWidget):
         
         if is_overdraft:
             self._time_label.setStyleSheet(self._overdraft_style)
-            self._mode_label.setText("OVERDRAFT MODE")
-            self._mode_label.setStyleSheet("font-weight: bold; color: #FF4500;")
         else:
-            self._time_label.setStyleSheet(self._normal_style)
-            self._mode_label.setText("NORMAL MODE")
-            self._mode_label.setStyleSheet("font-weight: bold; color: #4A4A4A;") 
+            self._time_label.setStyleSheet(self._normal_style) 

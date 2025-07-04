@@ -21,7 +21,7 @@ def app_manager():
     
     # Create mock for the time_balance
     mock_time_balance = MagicMock()
-    manager.get_time_balance.return_value = mock_time_balance
+    manager.get_time_bank.return_value = mock_time_balance
     
     return manager
 

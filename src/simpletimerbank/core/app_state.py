@@ -287,7 +287,7 @@ class AppStateManager:
         """Shutdown the application and save state."""
         self._app_state.shutdown()
     
-    def get_time_balance(self) -> TimeBank:
+    def get_time_bank(self) -> TimeBank:
         """Get the time balance instance.
         
         Returns
@@ -348,20 +348,28 @@ class AppStateManager:
         
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
     
-    def start_timer(self) -> bool:
-        """Start the timer with the current balance.
+    def start_timer(self, duration: int) -> bool:
+        """Start the timer with a specific duration.
         
+        Parameters
+        ----------
+        duration : int
+            The duration for the timer session in seconds.
+
         Returns
         -------
         bool
             True if timer started successfully, False otherwise.
         """
-        duration = self.get_balance_seconds()
         return self._app_state.start_session(duration)
     
     def pause_timer(self) -> None:
         """Pause the timer."""
         self._app_state.pause_session()
+    
+    def resume_timer(self) -> None:
+        """Resume a paused timer."""
+        self._app_state.resume_session()
     
     def stop_timer(self) -> None:
         """Stop the timer and refund any remaining time."""
@@ -405,4 +413,14 @@ class AppStateManager:
         timer : QTimer
             The QTimer instance.
         """
-        self._qt_timer = timer 
+        self._qt_timer = timer
+        
+    def is_overdrafting(self) -> bool:
+        """Check if the timer is in overdraft mode.
+        
+        Returns
+        -------
+        bool
+            True if the timer is overdrafting, False otherwise.
+        """
+        return self._app_state.get_countdown_timer().is_overdrafting() 

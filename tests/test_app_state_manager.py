@@ -82,16 +82,13 @@ class TestAppStateManager:
         """Test starting the timer."""
         # Setup
         mock_instance = mock_app_state.return_value
-        mock_bank = MagicMock(spec=TimeBank)
-        mock_bank.get_balance.return_value = 3600  # 1 hour
-        mock_instance.get_time_bank.return_value = mock_bank
         
         # Execute
         manager = AppStateManager()
-        manager.start_timer()
+        manager.start_timer(60) # Start with a 60-second duration
         
         # Verify
-        mock_instance.start_session.assert_called_once_with(3600)
+        mock_instance.start_session.assert_called_once_with(60)
     
     @patch('simpletimerbank.core.app_state.AppState')
     def test_pause_timer(self, mock_app_state):
@@ -179,4 +176,31 @@ class TestAppStateManager:
         manager.set_timer_callback(callback)
         
         # Verify
-        mock_instance.set_timer_tick_callback.assert_called_once_with(callback) 
+        mock_instance.set_timer_tick_callback.assert_called_once_with(callback)
+
+    @patch('simpletimerbank.core.app_state.AppState')
+    def test_set_timer_completion_callback(self, mock_app_state):
+        """Test setting the timer completion callback."""
+        # Setup
+        mock_instance = mock_app_state.return_value
+        callback = MagicMock()
+        
+        # Execute
+        manager = AppStateManager()
+        manager.set_timer_completion_callback(callback)
+        manager._app_state.set_timer_completion_callback.assert_called_once_with(callback)
+
+    @patch('simpletimerbank.core.app_state.AppState')
+    def test_is_overdrafting(self, mock_app_state):
+        """Test checking the overdraft status."""
+        manager = AppStateManager()
+        mock_timer = manager._app_state.get_countdown_timer()
+
+        # Case 1: Not overdrafting
+        mock_timer.is_overdrafting.return_value = False
+        assert not manager.is_overdrafting()
+        mock_timer.is_overdrafting.assert_called_once()
+
+        # Case 2: Is overdrafting
+        mock_timer.is_overdrafting.return_value = True
+        assert manager.is_overdrafting() 

@@ -244,4 +244,136 @@ class AppState:
         """
         self._tick_callback = callback
         if self._countdown_timer.get_state() != TimerState.IDLE:
-            self._countdown_timer.set_tick_callback(callback) 
+            self._countdown_timer.set_tick_callback(callback)
+
+
+class AppStateManager:
+    """GUI-friendly wrapper for AppState that provides simplified methods
+    for the user interface layer.
+    
+    This class serves as an interface between the GUI and the core application state,
+    providing methods that map well to UI interactions.
+    """
+    
+    def __init__(self) -> None:
+        """Initialize AppStateManager with a new AppState instance."""
+        self._app_state = AppState()
+        self._qt_timer = None
+    
+    def initialize(self) -> None:
+        """Initialize the application state and prepare for use."""
+        self._app_state.initialize()
+    
+    def shutdown(self) -> None:
+        """Shutdown the application and save state."""
+        self._app_state.shutdown()
+    
+    def get_time_balance(self) -> TimeBank:
+        """Get the time balance instance.
+        
+        Returns
+        -------
+        TimeBank
+            The time balance instance.
+        """
+        return self._app_state.get_time_bank()
+    
+    def set_balance(self, seconds: int) -> None:
+        """Set the time balance directly.
+        
+        Parameters
+        ----------
+        seconds : int
+            New balance value in seconds.
+        
+        Raises
+        ------
+        ValueError
+            If seconds is negative.
+        """
+        self._app_state.get_time_bank().set_balance(seconds)
+    
+    def add_time(self, seconds: int) -> None:
+        """Add time to the balance.
+        
+        Parameters
+        ----------
+        seconds : int
+            Amount of time to add in seconds.
+        """
+        self._app_state.get_time_bank().deposit(seconds)
+    
+    def get_balance_seconds(self) -> int:
+        """Get the current time balance in seconds.
+        
+        Returns
+        -------
+        int
+            Balance in seconds.
+        """
+        return self._app_state.get_time_bank().get_balance()
+    
+    def get_balance_formatted(self) -> str:
+        """Get the current time balance formatted as HH:MM:SS.
+        
+        Returns
+        -------
+        str
+            Formatted time string.
+        """
+        total_seconds = self.get_balance_seconds()
+        
+        # Format as HH:MM:SS
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    
+    def start_timer(self) -> bool:
+        """Start the timer with the current balance.
+        
+        Returns
+        -------
+        bool
+            True if timer started successfully, False otherwise.
+        """
+        duration = self.get_balance_seconds()
+        return self._app_state.start_session(duration)
+    
+    def pause_timer(self) -> None:
+        """Pause the timer."""
+        self._app_state.pause_session()
+    
+    def stop_timer(self) -> None:
+        """Stop the timer and refund any remaining time."""
+        self._app_state.stop_session()
+    
+    def get_timer_state(self) -> TimerState:
+        """Get the current timer state.
+        
+        Returns
+        -------
+        TimerState
+            Current state of the timer.
+        """
+        return self._app_state.get_countdown_timer().get_state()
+    
+    def set_timer_callback(self, callback: Callable[[int], None]) -> None:
+        """Set callback function for timer ticks.
+        
+        Parameters
+        ----------
+        callback : Callable[[int], None]
+            Function to call with remaining seconds on each tick.
+        """
+        self._app_state.set_timer_tick_callback(callback)
+    
+    def set_qt_timer(self, timer) -> None:
+        """Set the QTimer instance used for timer ticks.
+        
+        Parameters
+        ----------
+        timer : QTimer
+            The QTimer instance.
+        """
+        self._qt_timer = timer 

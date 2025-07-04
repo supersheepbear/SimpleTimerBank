@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 )
 
 from simpletimerbank.core.app_state import AppStateManager
+from simpletimerbank.core.countdown_timer import TimerState
 from simpletimerbank.gui.widgets.time_display import TimeDisplayWidget
 from simpletimerbank.gui.widgets.time_edit import TimeEditWidget
 from simpletimerbank.gui.widgets.timer_control import TimerControlWidget
@@ -67,11 +68,24 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self._timer_control)
         main_layout.addWidget(self._time_edit)
         
+        # Setup timer for regular ticks
+        self._setup_timer()
+        
         # Connect signals and slots
         self._connect_signals()
         
         # Set initial state from AppManager
         self._update_ui_from_manager()
+    
+    def _setup_timer(self) -> None:
+        """Set up the Qt timer for regular timer ticks."""
+        self._timer = QTimer(self)
+        self._timer.setInterval(1000)  # 1 second interval
+        self._timer.timeout.connect(self._handle_timer_tick)
+        self._timer.start()
+        
+        # Set the timer in the app manager
+        self._app_manager.set_qt_timer(self._timer)
     
     def _connect_signals(self) -> None:
         """Connect widget signals to appropriate handler methods."""
@@ -94,12 +108,24 @@ class MainWindow(QMainWindow):
         self._timer_control.update_button_states(self._app_manager.get_timer_state())
     
     def _handle_add_time(self, seconds: int) -> None:
-        """Handle request to add time."""
+        """Handle request to add time.
+        
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to add to the balance.
+        """
         self._app_manager.add_time(seconds)
         self._update_ui_from_manager()
     
     def _handle_set_time(self, seconds: int) -> None:
-        """Handle request to set the time balance directly."""
+        """Handle request to set the time balance directly.
+        
+        Parameters
+        ----------
+        seconds : int
+            New balance value in seconds.
+        """
         try:
             self._app_manager.set_balance(seconds)
         except ValueError as e:
@@ -107,8 +133,13 @@ class MainWindow(QMainWindow):
         self._update_ui_from_manager()
     
     def _handle_subtract_time(self, seconds: int) -> None:
-        """Handle request to subtract time."""
-        # Check if balance is sufficient before subtracting
+        """Handle request to subtract time.
+        
+        Parameters
+        ----------
+        seconds : int
+            Number of seconds to subtract from the balance.
+        """
         current_balance = self._app_manager.get_balance_seconds()
         if seconds > current_balance:
             QMessageBox.warning(
@@ -117,23 +148,12 @@ class MainWindow(QMainWindow):
                 "Cannot subtract more time than is available in the balance.",
             )
         else:
-            # We need to create a temporary TimeBalance object for this check
-            # as the core logic does not have this validation.
-            # In a more complex app, this logic might be in the manager.
-            from simpletimerbank.core.time_balance import TimeBalance
-            temp_tb = TimeBalance()
-            temp_tb.add_time(current_balance)
-            if temp_tb.subtract_time(seconds):
-                # This seems overly complex. Let's simplify and just subtract
-                # The core logic already prevents going below zero.
-                # However, the user might want a warning.
-                # Re-evaluating... The core subtract_time returns False if fails.
-                # The AppStateManager should expose this. For now, let's keep it simple.
-                self._app_manager.get_time_balance().subtract_time(seconds)
+            try:
+                # Get the time bank and subtract time directly
+                self._app_manager.get_time_balance().withdraw(seconds)
                 self._update_ui_from_manager()
-            else:
-                # This branch should not be reachable with the check above, but for safety:
-                QMessageBox.critical(self, "Error", "An unexpected error occurred.")
+            except ValueError as e:
+                QMessageBox.critical(self, "Error", str(e))
     
     def _handle_start_timer(self) -> None:
         """Handle request to start or resume the timer."""
@@ -143,7 +163,17 @@ class MainWindow(QMainWindow):
             )
             return
             
-        self._app_manager.start_timer()
+        if self._app_manager.get_timer_state() == TimerState.PAUSED:
+            # Resume if paused
+            self._app_manager.pause_timer()
+        else:
+            # Start new session with current balance
+            if not self._app_manager.start_timer():
+                QMessageBox.warning(
+                    self, "Start Failed", "Failed to start timer session."
+                )
+                return
+        
         self._update_ui_from_manager()
     
     def _handle_pause_timer(self) -> None:
@@ -156,8 +186,20 @@ class MainWindow(QMainWindow):
         self._app_manager.stop_timer()
         self._update_ui_from_manager()
     
+    def _handle_timer_tick(self) -> None:
+        """Handle timer tick from QTimer."""
+        if self._app_manager.get_timer_state() == TimerState.RUNNING:
+            self._app_manager._app_state.tick_timer()
+            self._update_ui_from_manager()
+    
     def _on_timer_tick(self, remaining_seconds: int) -> None:
-        """Update the UI on each timer tick."""
+        """Update the UI on each timer tick.
+        
+        Parameters
+        ----------
+        remaining_seconds : int
+            Remaining seconds in the timer.
+        """
         formatted_time = self._app_manager.get_balance_formatted()
         self._time_display.update_time(formatted_time)
         

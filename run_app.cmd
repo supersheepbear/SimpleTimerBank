@@ -1,2 +1,2 @@
-uv run simpletimerbank
+uv run python -m simpletimerbank.main
 pause

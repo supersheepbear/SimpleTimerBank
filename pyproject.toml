@@ -1,6 +1,6 @@
 [project]
 name = "SimpleTimerBank"
-version = "0.0.2"
+version = "1.0.0"
 description = "A desktop application for managing your personal \"free time\" bank."
 authors = [{ name = "supersheepbear", email = "supersheepbear@gmail.com" }]
 readme = "README.md"

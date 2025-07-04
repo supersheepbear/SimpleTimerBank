@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         amount_label = QLabel("Amount:")
         self._amount_edit = QTimeEdit(self)
         self._amount_edit.setDisplayFormat("HH:mm:ss")
-        self._amount_edit.setTime(QTime(0, 15, 0))
+        self._amount_edit.setTime(QTime(0, 0, 0))
         self._amount_edit.setStyleSheet("font-size: 14px; font-weight: bold;")
         amount_layout.addWidget(amount_label)
         amount_layout.addWidget(self._amount_edit)

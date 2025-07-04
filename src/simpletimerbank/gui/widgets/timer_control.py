@@ -47,7 +47,7 @@ class TimerControlWidget(QWidget):
         # Create buttons
         self._start_button = QPushButton("Start Timer", self)
         self._pause_button = QPushButton("Pause Timer", self)
-        self._stop_button = QPushButton("Stop Timer & Refund", self)
+        self._stop_button = QPushButton("Stop Timer", self)
         
         # Set size policy to make buttons expand
         size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)

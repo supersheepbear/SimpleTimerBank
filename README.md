@@ -24,7 +24,29 @@ A sophisticated desktop application built with PySide6 that allows you to manage
 -   **Persistent State**: Your time bank balance is automatically saved when you close the application and reloaded on startup.
 -   **Polished UI**: A clean, visually organized interface with distinct sections for different actions.
 
-## Installation and-Running
+## Installation
+
+The recommended way to install Simple Timer Bank is via `pip` or `uv`:
+
+```bash
+# Using pip
+pip install simpletimerbank
+
+# Or using uv
+uv add simpletimerbank
+```
+
+## Usage
+
+Once installed, you can run the application from your terminal:
+
+```bash
+simpletimerbank
+```
+
+## Development Setup
+
+If you wish to contribute to the project, follow these steps to set up a development environment.
 
 1.  **Clone the Repository**:
     ```bash
@@ -39,16 +61,16 @@ A sophisticated desktop application built with PySide6 that allows you to manage
     uv venv
     # Activate it (example for Windows PowerShell)
     .venv\Scripts\Activate.ps1
-    # Install the project and its dependencies
+    # Install the project in editable mode with its dependencies
     uv pip install -e .
     ```
 
-3.  **Run the Application**:
+3.  **Run the Application from Source**:
     ```bash
     python -m src.simpletimerbank.main
     ```
 
-## Development
+## Development Tasks
 
 -   **Run Tests**: `make test` or `uv run pytest`
 -   **Build Documentation**: `make doc`

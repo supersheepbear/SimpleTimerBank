@@ -31,8 +31,8 @@ def _get_asset_path(filename: str) -> str:
         # Path when running from a PyInstaller bundle
         base_path = sys._MEIPASS
     else:
-        # Path when running from source
-        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        # Path when running from source. Go up three levels from core -> simpletimerbank -> src -> project root.
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     
     return os.path.join(base_path, 'assets', filename)
 
